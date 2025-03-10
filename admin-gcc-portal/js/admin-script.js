@@ -435,3 +435,8 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Welcome to your dashboard!', 'success');
   }
 });
+
+document.getElementById("toggleCalendar").addEventListener("click", function() {
+  var calendar = document.getElementById("miniCalendar");
+  calendar.classList.toggle("collapsed");
+});
