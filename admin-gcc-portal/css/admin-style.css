@@ -861,3 +861,7 @@ a:hover {
   --bg-light: #2c2f33;
   --border-color: #40444b;
 }
+
+.mini-calendar.collapsed {
+  display: none;
+}
