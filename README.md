@@ -122,6 +122,3 @@ For technical support, please contact:
 ## Creators & Contributors
 - **Uwami Mgxekwa** - [GitHub Profile](https://github.com/Uwami-Mgxekwa)
 - **Handome Nyathi** - [GitHub Profile](https://github.com/MisterH100)
-
-## Acknowledgments
-- Special thanks to the Student Affairs division for requirements gathering
