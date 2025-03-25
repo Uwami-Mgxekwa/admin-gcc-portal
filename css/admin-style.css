@@ -46,7 +46,8 @@ a:hover {
   justify-content: space-between;
   align-items: center;
   box-shadow: var(--shadow);
-  position: sticky;
+  width: 100vw;
+  position: fixed;
   top: 0;
   z-index: 100;
 }
