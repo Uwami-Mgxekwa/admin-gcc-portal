@@ -268,10 +268,10 @@ async function loadStudents() {
     tbody.innerHTML = students.map(student => `
       <tr>
         <td>${student.student_id}</td>
-        <td>${student.name || 'N/A'}</td>
-        <td>${student.surname || 'N/A'}</td>
+        <td>${student.first_name || student.name || '-'}</td>
+        <td>${student.last_name || student.surname || '-'}</td>
         <td>${student.course || 'Information Technology'}</td>
-        <td>Year ${student.year || 'N/A'}</td>
+        <td>${student.email || student.student_id + '@gcc.edu'}</td>
         <td>${new Date(student.created_at).toLocaleDateString()}</td>
       </tr>
     `).join('');
