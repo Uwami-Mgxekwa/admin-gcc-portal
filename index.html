@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GCC Admin Dashboard</title>
-    <link rel="icon" type="image/png" href="../assets/logo.png" />
+    <link rel="icon" type="image/png" href="../../assets/logo.png" />
     <link rel="stylesheet" href="../css/admin-style.css" />
     <link
       rel="stylesheet"
@@ -12,61 +12,34 @@
     />
   </head>
   <body>
-
-    <div class="calendar-widget">
-  <h3>Calendar</h3>
-  <button id="toggleCalendar">Toggle Calendar</button>
-  <!--<div class="mini-calendar" id="miniCalendar"></div>-->
-</div>
     
     <header class="header">
       <div class="logo-container">
         <div class="menu-toggle" id="menuToggle">
           <i class="fas fa-bars"></i>
         </div>
-        <img src="../assets/logo.png" alt="School Logo" class="school-logo" />
+        <img src="../../assets/logo.png" alt="School Logo" class="school-logo" />
         <p>Gauteng City College Admin</p>
       </div>
       <div class="greeting-wrapper">
         <p class="greeting" id="greeting">Welcome, Admin</p>
-        <img id="profile-img" src="" />
       </div>
     </header>
 
     <div class="content-wrapper">
       <div class="sidebar collapsed" id="sidebar">
         <nav>
-          <div class="nav-item active">
+          <div class="nav-item active" data-page="dashboard">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
           </div>
-          <div class="nav-item">
+          <div class="nav-item" data-page="students">
             <i class="fas fa-users"></i>
-            <span>User Management</span>
+            <span>Students</span>
           </div>
-          <div class="nav-item">
-            <i class="fas fa-book"></i>
-            <span>Course Management</span>
-          </div>
-          <div class="nav-item">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Schedule Management</span>
-          </div>
-          <div class="nav-item">
+          <div class="nav-item" data-page="files">
             <i class="fas fa-file-alt"></i>
-            <span>Resource Management</span>
-          </div>
-          <div class="nav-item">
-            <i class="fas fa-bell"></i>
-            <span>Event Management</span>
-          </div>
-          <div class="nav-item">
-            <i class="fas fa-chart-bar"></i>
-            <span>Analytics</span>
-          </div>
-          <div class="nav-item">
-            <i class="fas fa-cog"></i>
-            <span>Settings</span>
+            <span>File Manager</span>
           </div>
           <div class="nav-item sign-out" id="sign-out">
             <i class="fas fa-sign-out-alt"></i>
@@ -77,322 +50,153 @@
       <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
       <div class="main-content" id="mainContent">
-        <div class="admin-header">
-          <h1>Admin Dashboard</h1>
-          <div class="date-display" id="currentDate"></div>
-        </div>
-
-        <div class="stats-cards">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-user-graduate"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Total Students</h3>
-              <p class="stat-number">2,850</p>
-              <p class="stat-trend positive"><i class="fas fa-arrow-up"></i> 5.2% from last month</p>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-chalkboard-teacher"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Active Courses</h3>
-              <p class="stat-number">42</p>
-              <p class="stat-trend positive"><i class="fas fa-arrow-up"></i> 3.1% from last month</p>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-clipboard-check"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Assignments</h3>
-              <p class="stat-number">187</p>
-              <p class="stat-trend negative"><i class="fas fa-arrow-down"></i> 2.3% from last month</p>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="stat-info">
-              <h3>Upcoming Events</h3>
-              <p class="stat-number">12</p>
-              <p class="stat-trend positive"><i class="fas fa-arrow-up"></i> 8.5% from last month</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="admin-sections">
-          <div class="admin-section quick-actions">
-            <h2>Quick Actions</h2>
-            <div class="action-buttons">
-              <button class="action-btn" id="addUserBtn">
-                <i class="fas fa-user-plus"></i>
-                <span>Add New User</span>
-              </button>
-              <button class="action-btn" id="addCourseBtn">
-                <i class="fas fa-folder-plus"></i>
-                <span>Add New Course</span>
-              </button>
-              <button class="action-btn" id="addEventBtn">
-                <i class="fas fa-calendar-plus"></i>
-                <span>Create Event</span>
-              </button>
-              <button class="action-btn" id="uploadResourceBtn">
-                <i class="fas fa-file-upload"></i>
-                <span>Upload Resource</span>
-              </button>
-              <button class="action-btn" id="sendNotificationBtn">
-                <i class="fas fa-bell"></i>
-                <span>Send Notification</span>
-              </button>
-              <button class="action-btn" id="generateReportBtn">
-                <i class="fas fa-chart-line"></i>
-                <span>Generate Report</span>
-              </button>
-            </div>
+        <!-- Dashboard Page -->
+        <div class="page-content active" id="dashboardPage">
+          <div class="admin-header">
+            <h1>Dashboard Overview</h1>
+            <div class="date-display" id="currentDate"></div>
           </div>
 
-          <div class="admin-section recent-activity">
-            <h2>Recent Activity</h2>
-            <div class="activity-list">
-              <div class="activity-item">
-                <div class="activity-icon">
-                  <i class="fas fa-user-plus"></i>
-                </div>
-                <div class="activity-details">
-                  <p class="activity-desc">New student registered</p>
-                  <p class="activity-subject">James Wilson</p>
-                  <p class="activity-time">Today, 09:45 AM</p>
-                </div>
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-user-graduate"></i>
               </div>
-              <div class="activity-item">
-                <div class="activity-icon">
-                  <i class="fas fa-book"></i>
-                </div>
-                <div class="activity-details">
-                  <p class="activity-desc">Course updated</p>
-                  <p class="activity-subject">Business Economics 201</p>
-                  <p class="activity-time">Today, 08:30 AM</p>
-                </div>
+              <div class="stat-info">
+                <h3>Total Students</h3>
+                <p class="stat-number" id="totalStudents">0</p>
               </div>
-              <div class="activity-item">
-                <div class="activity-icon">
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-file-pdf"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Files</h3>
+                <p class="stat-number" id="totalFiles">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="fas fa-user-check"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Active Today</h3>
+                <p class="stat-number" id="activeToday">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-sections">
+            <div class="admin-section quick-actions">
+              <h2>Quick Actions</h2>
+              <div class="action-buttons">
+                <button class="action-btn" id="viewStudentsBtn">
+                  <i class="fas fa-users"></i>
+                  <span>View Students</span>
+                </button>
+                <button class="action-btn" id="manageFilesBtn">
                   <i class="fas fa-file-upload"></i>
-                </div>
-                <div class="activity-details">
-                  <p class="activity-desc">New resource uploaded</p>
-                  <p class="activity-subject">Final Exam Timetable</p>
-                  <p class="activity-time">Yesterday, 04:15 PM</p>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon">
-                  <i class="fas fa-calendar-plus"></i>
-                </div>
-                <div class="activity-details">
-                  <p class="activity-desc">New event created</p>
-                  <p class="activity-subject">Career Fair 2025</p>
-                  <p class="activity-time">Yesterday, 01:30 PM</p>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="activity-icon">
-                  <i class="fas fa-user-edit"></i>
-                </div>
-                <div class="activity-details">
-                  <p class="activity-desc">User profile updated</p>
-                  <p class="activity-subject">Sarah Johnson</p>
-                  <p class="activity-time">Mar 8, 2025, 10:20 AM</p>
-                </div>
-              </div>
-            </div>
-            <a href="#" class="view-all">View All Activity</a>
-          </div>
-        </div>
-
-        <div class="admin-sections">
-          <div class="admin-section system-alerts">
-            <h2>System Alerts</h2>
-            <div class="alerts-list">
-              <div class="alert-item alert-warning">
-                <div class="alert-icon">
-                  <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="alert-content">
-                  <p class="alert-title">Database Maintenance</p>
-                  <p class="alert-message">Scheduled maintenance on March 15, 2025, from 2:00 AM to 4:00 AM.</p>
-                </div>
-              </div>
-              <div class="alert-item alert-danger">
-                <div class="alert-icon">
-                  <i class="fas fa-times-circle"></i>
-                </div>
-                <div class="alert-content">
-                  <p class="alert-title">Storage Space Low</p>
-                  <p class="alert-message">Resource storage space is below 15%. Consider cleanup or upgrade.</p>
-                </div>
-              </div>
-              <div class="alert-item alert-success">
-                <div class="alert-icon">
-                  <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="alert-content">
-                  <p class="alert-title">Backup Successful</p>
-                  <p class="alert-message">System backup completed successfully on March 9, 2025, at 1:00 AM.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="admin-section pending-approvals">
-            <h2>Pending Approvals</h2>
-            <div class="pending-list">
-              <div class="pending-item">
-                <div class="pending-details">
-                  <h4>Resource Upload</h4>
-                  <p>New Economics study guide by Prof. Ndlovu</p>
-                </div>
-                <div class="pending-actions">
-                  <button class="btn-approve"><i class="fas fa-check"></i></button>
-                  <button class="btn-reject"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-              <div class="pending-item">
-                <div class="pending-details">
-                  <h4>Event Request</h4>
-                  <p>Student Council meeting on March 18, 2025</p>
-                </div>
-                <div class="pending-actions">
-                  <button class="btn-approve"><i class="fas fa-check"></i></button>
-                  <button class="btn-reject"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-              <div class="pending-item">
-                <div class="pending-details">
-                  <h4>Course Creation</h4>
-                  <p>New elective: Digital Marketing Fundamentals</p>
-                </div>
-                <div class="pending-actions">
-                  <button class="btn-approve"><i class="fas fa-check"></i></button>
-                  <button class="btn-reject"><i class="fas fa-times"></i></button>
-                </div>
-              </div>
-            </div>
-            <a href="#" class="view-all">View All Pending Items</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-sidebar">
-        <div class="calendar-widget">
-          <h3>Calendar</h3>
-          <div class="mini-calendar" id="miniCalendar"></div>
-        </div>
-
-        <div class="recent-users">
-          <h3>Recently Active Users</h3>
-          <div class="users-list">
-            <div class="user-item">
-              <div class="user-avatar"></div>
-              <div class="user-info">
-                <p class="user-name">Thabo Mbeki</p>
-                <p class="user-status">Online now</p>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar"></div>
-              <div class="user-info">
-                <p class="user-name">Nneka Okafor</p>
-                <p class="user-status">5 minutes ago</p>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar"></div>
-              <div class="user-info">
-                <p class="user-name">Michael Chen</p>
-                <p class="user-status">10 minutes ago</p>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar"></div>
-              <div class="user-info">
-                <p class="user-name">Fatima Ahmed</p>
-                <p class="user-status">15 minutes ago</p>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar"></div>
-              <div class="user-info">
-                <p class="user-name">David Smith</p>
-                <p class="user-status">30 minutes ago</p>
+                  <span>Manage Files</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="quick-notes">
-          <h3>Quick Notes</h3>
-          <div class="notes-container">
-            <textarea id="quickNotes" placeholder="Write a note..."></textarea>
-            <button id="saveNote" class="save-note">Save Note</button>
+        <!-- Students Page -->
+        <div class="page-content" id="studentsPage">
+          <div class="admin-header">
+            <h1>Student Management</h1>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" id="studentSearch" placeholder="Search students...">
+            </div>
+          </div>
+
+          <div class="students-table-container">
+            <table class="students-table">
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Surname</th>
+                  <th>Course</th>
+                  <th>Email</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody id="studentsTableBody">
+                <tr>
+                  <td colspan="6" class="loading">Loading students...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Files Page -->
+        <div class="page-content" id="filesPage">
+          <div class="admin-header">
+            <h1>File Manager</h1>
+            <button class="btn-primary" id="uploadFileBtn">
+              <i class="fas fa-upload"></i> Upload File
+            </button>
+          </div>
+
+          <div class="files-grid" id="filesGrid">
+            <div class="loading">Loading files...</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal for Add User -->
-    <div class="modal" id="addUserModal">
+    <!-- Modal for Upload File -->
+    <div class="modal" id="uploadFileModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Add New User</h2>
+          <h2>Upload File</h2>
           <span class="close-modal">&times;</span>
         </div>
         <div class="modal-body">
-          <form id="addUserForm">
+          <form id="uploadFileForm">
             <div class="form-group">
-              <label for="firstName">First Name</label>
-              <input type="text" id="firstName" name="firstName" required>
+              <label for="fileName">File Name (without extension)</label>
+              <input type="text" id="fileName" name="fileName" placeholder="e.g., Exam Timetable 2025" required>
             </div>
             <div class="form-group">
-              <label for="lastName">Last Name</label>
-              <input type="text" id="lastName" name="lastName" required>
-            </div>
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-              <label for="userType">User Type</label>
-              <select id="userType" name="userType">
-                <option value="student">Student</option>
-                <option value="faculty">Faculty</option>
-                <option value="admin">Administrator</option>
+              <label for="fileCategory">Category</label>
+              <select id="fileCategory" name="fileCategory" required>
+                <option value="">Select Category</option>
+                <option value="timetables">Timetables</option>
+                <option value="forms">Forms</option>
+                <option value="guides">Study Guides</option>
+                <option value="policies">Policies</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="department">Department</label>
-              <select id="department" name="department">
-                <option value="">Select Department</option>
-                <option value="business">Business Studies</option>
-                <option value="economics">Economics</option>
-                <option value="accounting">Accounting</option>
-                <option value="it">Information Technology</option>
-                <option value="language">Languages</option>
-              </select>
+              <label for="fileUpload">Select PDF File</label>
+              <div class="file-upload-area" id="fileUploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop your PDF here or click to browse</p>
+                <input type="file" id="fileUpload" name="fileUpload" accept=".pdf" required>
+              </div>
+              <div id="filePreview" class="file-preview"></div>
             </div>
             <div class="form-actions">
               <button type="button" class="btn-cancel">Cancel</button>
-              <button type="submit" class="btn-submit">Add User</button>
+              <button type="submit" class="btn-submit">Upload File</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
+    <!-- Alert Container -->
+    <div id="alertContainer" class="alert-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="../js/admin-script.js"></script>
   </body>
 </html>

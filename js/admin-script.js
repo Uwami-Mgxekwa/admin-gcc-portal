@@ -1,3 +1,8 @@
+// Supabase Configuration
+const SUPABASE_URL = 'https://qnroaigdrpoceasbqtmh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucm9haWdkcnBvY2Vhc2JxdG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1MzIzMzgsImV4cCI6MjA3ODEwODMzOH0.AnySEJv5FLNikQ6aGlpg-p7YSpqINjvbMuuLe4SFKQc';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // DOM Elements
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
@@ -5,38 +10,40 @@ const sidebarOverlay = document.getElementById('sidebarOverlay');
 const mainContent = document.getElementById('mainContent');
 const currentDateEl = document.getElementById('currentDate');
 const greeting = document.getElementById('greeting');
-const profileImg = document.getElementById('profile-img');
-const miniCalendar = document.getElementById('miniCalendar');
-const quickNotes = document.getElementById('quickNotes');
-const saveNote = document.getElementById('saveNote');
-
-// Modal elements
-const addUserBtn = document.getElementById('addUserBtn');
-const addUserModal = document.getElementById('addUserModal');
-const addCourseBtn = document.getElementById('addCourseBtn');
-const addEventBtn = document.getElementById('addEventBtn');
-const uploadResourceBtn = document.getElementById('uploadResourceBtn');
-const sendNotificationBtn = document.getElementById('sendNotificationBtn');
-const generateReportBtn = document.getElementById('generateReportBtn');
-const closeModalBtns = document.querySelectorAll('.close-modal, .btn-cancel');
-const addUserForm = document.getElementById('addUserForm');
 const signOutBtn = document.getElementById('sign-out');
 
-const adminUser = {
-  name: 'John Doe',
-  email: 'john.doe@gcc.edu',
-  role: 'Admin',
-  profileImage: '../assets/profile.jpg',
-};
+// Page elements
+const dashboardPage = document.getElementById('dashboardPage');
+const studentsPage = document.getElementById('studentsPage');
+const filesPage = document.getElementById('filesPage');
+
+// Modal elements
+const uploadFileModal = document.getElementById('uploadFileModal');
+const uploadFileForm = document.getElementById('uploadFileForm');
+const closeModalBtns = document.querySelectorAll('.close-modal, .btn-cancel');
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  initDashboard();
+  setupEventListeners();
+  loadDashboardStats();
+});
 
 function initDashboard() {
   setCurrentDate();
   setGreeting();
-  setupEventListeners();
-  loadProfileInfo();
-  setupCalendar();
-  loadSavedNotes();
-  setupCalendarToggle(); // Add calendar toggle functionality
+  checkAuth();
+}
+
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    //window.location.href = '../../index.html';
+    return;
+  }
+  
+  // Check if user is admin (you can add admin role check here)
+  greeting.textContent = `Welcome, Admin`;
 }
 
 function setCurrentDate() {
@@ -57,43 +64,43 @@ function setGreeting() {
     greetingText += 'Evening';
   }
   
-  greeting.textContent = `${greetingText}, ${adminUser.name}`;
-}
-
-function loadProfileInfo() {
-  if (adminUser.profileImage) {
-    profileImg.src = adminUser.profileImage;
-    profileImg.alt = adminUser.name;
-  }
+  greeting.textContent = `${greetingText}, Admin`;
 }
 
 function setupEventListeners() {
+  // Sidebar toggle
   menuToggle.addEventListener('click', toggleSidebar);
   sidebarOverlay.addEventListener('click', closeSidebar);
   
+  // Navigation
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => {
     item.addEventListener('click', function() {
       if (this.classList.contains('sign-out')) {
         handleSignOut();
       } else {
-        navItems.forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
-        
-        if (window.innerWidth <= 768) {
-          closeSidebar();
+        const page = this.getAttribute('data-page');
+        if (page) {
+          switchPage(page);
+          navItems.forEach(i => i.classList.remove('active'));
+          this.classList.add('active');
+          
+          if (window.innerWidth <= 768) {
+            closeSidebar();
+          }
         }
       }
     });
   });
   
-  addUserBtn.addEventListener('click', () => openModal(addUserModal));
-  addCourseBtn.addEventListener('click', () => showNotImplemented('Add Course'));
-  addEventBtn.addEventListener('click', () => showNotImplemented('Create Event'));
-  uploadResourceBtn.addEventListener('click', () => showNotImplemented('Upload Resource'));
-  sendNotificationBtn.addEventListener('click', () => showNotImplemented('Send Notification'));
-  generateReportBtn.addEventListener('click', () => showNotImplemented('Generate Report'));
+  // Quick action buttons
+  document.getElementById('viewStudentsBtn')?.addEventListener('click', () => switchPage('students'));
+  document.getElementById('manageFilesBtn')?.addEventListener('click', () => switchPage('files'));
   
+  // Upload file button
+  document.getElementById('uploadFileBtn')?.addEventListener('click', () => openModal(uploadFileModal));
+  
+  // Modal close
   closeModalBtns.forEach(btn => {
     btn.addEventListener('click', closeAllModals);
   });
@@ -104,24 +111,263 @@ function setupEventListeners() {
     }
   });
   
-  addUserForm.addEventListener('submit', handleAddUser);
+  // Upload form
+  uploadFileForm.addEventListener('submit', handleFileUpload);
   
-  saveNote.addEventListener('click', saveUserNotes);
+  // File upload drag and drop
+  const fileUploadArea = document.getElementById('fileUploadArea');
+  const fileUpload = document.getElementById('fileUpload');
   
-  const approveButtons = document.querySelectorAll('.btn-approve');
-  const rejectButtons = document.querySelectorAll('.btn-reject');
+  fileUploadArea.addEventListener('click', () => fileUpload.click());
   
-  approveButtons.forEach(btn => {
-    btn.addEventListener('click', () => handleApproval(btn, true));
+  fileUploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    fileUploadArea.classList.add('dragover');
   });
   
-  rejectButtons.forEach(btn => {
-    btn.addEventListener('click', () => handleApproval(btn, false));
+  fileUploadArea.addEventListener('dragleave', () => {
+    fileUploadArea.classList.remove('dragover');
   });
   
+  fileUploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    fileUploadArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type === 'application/pdf') {
+      fileUpload.files = files;
+      showFilePreview(files[0]);
+    }
+  });
+  
+  fileUpload.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      showFilePreview(e.target.files[0]);
+    }
+  });
+  
+  // Student search
+  document.getElementById('studentSearch')?.addEventListener('input', (e) => {
+    filterStudents(e.target.value);
+  });
+  
+  // Sign out
   signOutBtn.addEventListener('click', handleSignOut);
   
   window.addEventListener('resize', handleResize);
+}
+
+function switchPage(pageName) {
+  // Hide all pages
+  document.querySelectorAll('.page-content').forEach(page => {
+    page.classList.remove('active');
+  });
+  
+  // Show selected page
+  const pageMap = {
+    'dashboard': dashboardPage,
+    'students': studentsPage,
+    'files': filesPage
+  };
+  
+  const selectedPage = pageMap[pageName];
+  if (selectedPage) {
+    selectedPage.classList.add('active');
+    
+    // Load data for the page
+    if (pageName === 'students') {
+      loadStudents();
+    } else if (pageName === 'files') {
+      loadFiles();
+    }
+  }
+}
+
+async function loadDashboardStats() {
+  try {
+    // Get total students
+    const { count: studentCount } = await supabase
+      .from('student_info')
+      .select('*', { count: 'exact', head: true });
+    
+    document.getElementById('totalStudents').textContent = studentCount || 0;
+    
+    // Count files in resources folder (this would need backend support)
+    // For now, we'll set a placeholder
+    document.getElementById('totalFiles').textContent = '0';
+    document.getElementById('activeToday').textContent = '0';
+    
+  } catch (error) {
+    console.error('Error loading stats:', error);
+    showAlert('Failed to load dashboard stats', 'error');
+  }
+}
+
+async function loadStudents() {
+  const tbody = document.getElementById('studentsTableBody');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading students...</td></tr>';
+  
+  try {
+    const { data: students, error } = await supabase
+      .from('student_info')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    if (!students || students.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="no-data">No students found</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = students.map(student => `
+      <tr>
+        <td>${student.student_id}</td>
+        <td>${student.name}</td>
+        <td>${student.surname}</td>
+        <td>${student.course || 'N/A'}</td>
+        <td>${student.student_id}@gcc.dummy</td>
+        <td>${new Date(student.created_at).toLocaleDateString()}</td>
+      </tr>
+    `).join('');
+    
+  } catch (error) {
+    console.error('Error loading students:', error);
+    tbody.innerHTML = '<tr><td colspan="6" class="error">Failed to load students</td></tr>';
+    showAlert('Failed to load students', 'error');
+  }
+}
+
+function filterStudents(searchTerm) {
+  const rows = document.querySelectorAll('#studentsTableBody tr');
+  const term = searchTerm.toLowerCase();
+  
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(term) ? '' : 'none';
+  });
+}
+
+async function loadFiles() {
+  const filesGrid = document.getElementById('filesGrid');
+  filesGrid.innerHTML = '<div class="loading">Loading files...</div>';
+  
+  // This is a placeholder - you'll need to implement actual file listing
+  // For now, we'll show the files that should be in the resources folder
+  const files = [
+    { name: 'Exam Timetable 2025', category: 'timetables', path: 'resources/Exam-Timetable-2025.pdf' },
+    { name: 'Application Form', category: 'forms', path: 'resources/Application-Form.pdf' },
+    { name: 'Student Handbook', category: 'guides', path: 'resources/Student-Handbook.pdf' }
+  ];
+  
+  if (files.length === 0) {
+    filesGrid.innerHTML = '<div class="no-data">No files uploaded yet</div>';
+    return;
+  }
+  
+  filesGrid.innerHTML = files.map(file => `
+    <div class="file-card">
+      <div class="file-icon">
+        <i class="fas fa-file-pdf"></i>
+      </div>
+      <div class="file-info">
+        <h4>${file.name}</h4>
+        <p class="file-category">${file.category}</p>
+        <p class="file-path">${file.path}</p>
+      </div>
+      <div class="file-actions">
+        <button class="btn-icon" onclick="downloadFile('${file.path}')" title="Download">
+          <i class="fas fa-download"></i>
+        </button>
+        <button class="btn-icon btn-danger" onclick="deleteFile('${file.name}')" title="Delete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+  
+  // Update file count
+  document.getElementById('totalFiles').textContent = files.length;
+}
+
+function showFilePreview(file) {
+  const preview = document.getElementById('filePreview');
+  preview.innerHTML = `
+    <div class="file-preview-item">
+      <i class="fas fa-file-pdf"></i>
+      <span>${file.name}</span>
+      <span class="file-size">${(file.size / 1024).toFixed(2)} KB</span>
+    </div>
+  `;
+}
+
+async function handleFileUpload(e) {
+  e.preventDefault();
+  
+  const fileName = document.getElementById('fileName').value;
+  const fileCategory = document.getElementById('fileCategory').value;
+  const fileInput = document.getElementById('fileUpload');
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    showAlert('Please select a file', 'error');
+    return;
+  }
+  
+  if (file.type !== 'application/pdf') {
+    showAlert('Only PDF files are allowed', 'error');
+    return;
+  }
+  
+  // Show loading
+  const submitBtn = e.target.querySelector('.btn-submit');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+  submitBtn.disabled = true;
+  
+  try {
+    // In a real implementation, you would upload to Supabase Storage
+    // For now, we'll just show a success message
+    // The file should be manually placed in the resources folder
+    
+    showAlert(`File "${fileName}.pdf" uploaded successfully! Please place it in the resources folder.`, 'success');
+    
+    closeAllModals();
+    uploadFileForm.reset();
+    document.getElementById('filePreview').innerHTML = '';
+    
+    // Reload files
+    if (filesPage.classList.contains('active')) {
+      loadFiles();
+    }
+    
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    showAlert('Failed to upload file', 'error');
+  } finally {
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
+}
+
+function downloadFile(path) {
+  window.open(`../../${path}`, '_blank');
+}
+
+function deleteFile(fileName) {
+  if (confirm(`Are you sure you want to delete "${fileName}"?`)) {
+    showAlert(`File "${fileName}" deleted. Please remove it from the resources folder.`, 'success');
+    loadFiles();
+  }
+}
+
+window.downloadFile = downloadFile;
+window.deleteFile = deleteFile;
+
+async function handleSignOut() {
+  if (confirm('Are you sure you want to sign out?')) {
+    await supabase.auth.signOut();
+    window.location.href = '../../index.html';
+  }
 }
 
 function toggleSidebar() {
@@ -131,8 +377,6 @@ function toggleSidebar() {
     sidebar.classList.toggle('active');
     sidebarOverlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
   }
-  
-  adjustMainContent();
 }
 
 function closeSidebar() {
@@ -142,30 +386,11 @@ function closeSidebar() {
   }
 }
 
-function adjustMainContent() {
-  if (sidebar.classList.contains('collapsed')) {
-    mainContent.style.marginLeft = '70px';
-    mainContent.style.width = window.innerWidth <= 992 ? 'calc(100% - 70px)' : 'calc(100% - 370px)';
-  } else {
-    mainContent.style.marginLeft = '250px';
-    mainContent.style.width = window.innerWidth <= 992 ? 'calc(100% - 250px)' : 'calc(100% - 550px)';
-  }
-  
-  if (window.innerWidth <= 768) {
-    mainContent.style.marginLeft = '0';
-    mainContent.style.width = '100%';
-  }
-}
-
 function handleResize() {
   if (window.innerWidth <= 768) {
     sidebar.classList.add('collapsed');
     sidebar.classList.remove('active');
     sidebarOverlay.style.display = 'none';
-    mainContent.style.marginLeft = '0';
-    mainContent.style.width = '100%';
-  } else {
-    adjustMainContent();
   }
 }
 
@@ -181,325 +406,32 @@ function closeAllModals() {
   });
 }
 
-function showNotImplemented(feature) {
-  alert(`${feature} feature is not implemented yet.`);
-}
-
-function handleAddUser(e) {
-  e.preventDefault();
+function showAlert(message, type = 'info') {
+  const container = document.getElementById('alertContainer');
+  const alert = document.createElement('div');
+  alert.className = `alert alert-${type}`;
   
-  const firstName = document.getElementById('firstName').value;
-  const lastName = document.getElementById('lastName').value;
-  const email = document.getElementById('email').value;
-  const userType = document.getElementById('userType').value;
-  const department = document.getElementById('department').value;
+  const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle';
   
-  console.log('Adding new user:', {
-    firstName,
-    lastName,
-    email,
-    userType,
-    department
-  });
-  
-  addNewActivity({
-    icon: 'user-plus',
-    desc: 'New user added',
-    subject: `${firstName} ${lastName}`,
-    time: 'Just now'
-  });
-  
-  closeAllModals();
-  e.target.reset();
-  
-  alert(`User ${firstName} ${lastName} added successfully!`);
-}
-
-function addNewActivity(activity) {
-  const activityList = document.querySelector('.activity-list');
-  const activityItem = document.createElement('div');
-  activityItem.className = 'activity-item';
-  
-  activityItem.innerHTML = `
-    <div class="activity-icon">
-      <i class="fas fa-${activity.icon}"></i>
-    </div>
-    <div class="activity-details">
-      <p class="activity-desc">${activity.desc}</p>
-      <p class="activity-subject">${activity.subject}</p>
-      <p class="activity-time">${activity.time}</p>
-    </div>
+  alert.innerHTML = `
+    <i class="fas fa-${icon}"></i>
+    <span>${message}</span>
+    <button class="alert-close"><i class="fas fa-times"></i></button>
   `;
   
-  activityList.insertBefore(activityItem, activityList.firstChild);
+  container.appendChild(alert);
   
-  if (activityList.children.length > 5) {
-    activityList.removeChild(activityList.lastChild);
-  }
-}
-
-function handleApproval(button, isApproved) {
-  const pendingItem = button.closest('.pending-item');
-  const itemDetails = pendingItem.querySelector('.pending-details h4').textContent;
+  setTimeout(() => alert.classList.add('show'), 10);
   
-  addNewActivity({
-    icon: isApproved ? 'check' : 'times',
-    desc: isApproved ? 'Item approved' : 'Item rejected',
-    subject: itemDetails,
-    time: 'Just now'
-  });
-  
-  pendingItem.style.backgroundColor = isApproved ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)';
-  setTimeout(() => {
-    pendingItem.style.transition = 'opacity 0.3s ease';
-    pendingItem.style.opacity = '0';
-    
-    setTimeout(() => {
-      pendingItem.remove();
-      
-      const pendingList = document.querySelector('.pending-list');
-      if (pendingList && pendingList.children.length === 0) {
-        pendingList.innerHTML = '<p class="no-items">No pending approvals at this time.</p>';
-      }
-    }, 300);
-  }, 500);
-}
-
-function handleSignOut() {
-  if (confirm('Are you sure you want to sign out?')) {
-    console.log('Signing out...');
-    window.location.href = '../index.html';
-  }
-}
-
-function setupCalendar() {
-  const date = new Date();
-  const currentMonth = date.getMonth();
-  const currentYear = date.getFullYear();
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  
-  let calendarHTML = `
-    <div class="calendar-header">
-      <button class="month-nav prev"><i class="fas fa-chevron-left"></i></button>
-      <h4>${monthNames[currentMonth]} ${currentYear}</h4>
-      <button class="month-nav next"><i class="fas fa-chevron-right"></i></button>
-    </div>
-    <div class="calendar-days">
-      <div class="day-name">Su</div>
-      <div class="day-name">Mo</div>
-      <div class="day-name">Tu</div>
-      <div class="day-name">We</div>
-      <div class="day-name">Th</div>
-      <div class="day-name">Fr</div>
-      <div class="day-name">Sa</div>
-  `;
-  
-  for (let i = 0; i < firstDayOfMonth; i++) {
-    calendarHTML += '<div class="day empty"></div>';
-  }
-  
-  for (let i = 1; i <= daysInMonth; i++) {
-    const isToday = i === date.getDate();
-    const hasEvent = [5, 12, 20, 25].includes(i);
-    
-    calendarHTML += `<div class="day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">${i}</div>`;
-  }
-  
-  const totalCells = Math.ceil((daysInMonth + firstDayOfMonth) / 7) * 7;
-  const remainingCells = totalCells - (daysInMonth + firstDayOfMonth);
-  
-  for (let i = 0; i < remainingCells; i++) {
-    calendarHTML += '<div class="day empty"></div>';
-  }
-  
-  calendarHTML += '</div>';
-
-  miniCalendar.innerHTML = calendarHTML;
-  
-  const prevMonthBtn = miniCalendar.querySelector('.month-nav.prev');
-  const nextMonthBtn = miniCalendar.querySelector('.month-nav.next');
-  
-  prevMonthBtn.addEventListener('click', () => {
-    showNotImplemented('Previous Month Navigation');
-  });
-  
-  nextMonthBtn.addEventListener('click', () => {
-    showNotImplemented('Next Month Navigation');
-  });
-  
-  const eventDays = miniCalendar.querySelectorAll('.day.has-event');
-  eventDays.forEach(day => {
-    day.addEventListener('click', () => {
-      showNotImplemented(`View Events for ${monthNames[currentMonth]} ${day.textContent}, ${currentYear}`);
-    });
-  });
-}
-
-// NEW FUNCTION: Setup right sidebar toggle functionality
-function setupCalendarToggle() {
-  const rightSidebar = document.querySelector('.right-sidebar');
-  
-  if (!rightSidebar) return;
-  
-  // Check if toggle button already exists
-  let toggleBtn = document.getElementById('toggleRightSidebar');
-  
-  if (!toggleBtn) {
-    // Create toggle button
-    toggleBtn = document.createElement('button');
-    toggleBtn.id = 'toggleRightSidebar';
-    toggleBtn.className = 'toggle-sidebar-btn';
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-    toggleBtn.title = 'Hide sidebar';
-    
-    // Insert button at the top of right sidebar
-    rightSidebar.insertBefore(toggleBtn, rightSidebar.firstChild);
-  }
-  
-  // Load saved state from localStorage
-  const isCollapsed = localStorage.getItem('rightSidebarCollapsed') === 'true';
-  if (isCollapsed) {
-    rightSidebar.classList.add('collapsed');
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-    toggleBtn.title = 'Show sidebar';
-    adjustMainContentWidth(true);
-  }
-  
-  // Add click event listener
-  toggleBtn.addEventListener('click', function() {
-    rightSidebar.classList.toggle('collapsed');
-    
-    if (rightSidebar.classList.contains('collapsed')) {
-      toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-      toggleBtn.title = 'Show sidebar';
-      localStorage.setItem('rightSidebarCollapsed', 'true');
-      adjustMainContentWidth(true);
-    } else {
-      toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-      toggleBtn.title = 'Hide sidebar';
-      localStorage.setItem('rightSidebarCollapsed', 'false');
-      adjustMainContentWidth(false);
-    }
-  });
-}
-
-// Adjust main content width based on sidebar state
-function adjustMainContentWidth(sidebarCollapsed) {
-  const mainContent = document.getElementById('mainContent');
-  const sidebar = document.getElementById('sidebar');
-  const sidebarWidth = sidebar.classList.contains('collapsed') ? 70 : 250;
-  
-  if (window.innerWidth <= 992) {
-    mainContent.style.width = `calc(100% - ${sidebarWidth}px)`;
-  } else {
-    if (sidebarCollapsed) {
-      mainContent.style.width = `calc(100% - ${sidebarWidth}px - 50px)`;
-    } else {
-      mainContent.style.width = `calc(100% - ${sidebarWidth}px - 300px)`;
-    }
-  }
-  
-  if (window.innerWidth <= 768) {
-    mainContent.style.width = '100%';
-  }
-}
-
-function saveUserNotes() {
-  const notes = quickNotes.value.trim();
-  if (notes) {
-    localStorage.setItem('adminNotes', notes);
-    alert('Note saved successfully!');
-  } else {
-    alert('Please enter some text to save a note.');
-  }
-}
-
-function loadSavedNotes() {
-  const savedNotes = localStorage.getItem('adminNotes');
-  if (savedNotes) {
-    quickNotes.value = savedNotes;
-  }
-}
-
-function showToast(message, type = 'info') {
-  let toastContainer = document.querySelector('.toast-container');
-  if (!toastContainer) {
-    toastContainer = document.createElement('div');
-    toastContainer.className = 'toast-container';
-    document.body.appendChild(toastContainer);
-  }
-  
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.innerHTML = `
-    <div class="toast-content">
-      <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i>
-      <span>${message}</span>
-    </div>
-    <button class="toast-close"><i class="fas fa-times"></i></button>
-  `;
-  
-  toastContainer.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.classList.add('show');
-  }, 10);
-  
-  const closeBtn = toast.querySelector('.toast-close');
-  closeBtn.addEventListener('click', () => {
-    toast.classList.remove('show');
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
+  alert.querySelector('.alert-close').addEventListener('click', () => {
+    alert.classList.remove('show');
+    setTimeout(() => alert.remove(), 300);
   });
   
   setTimeout(() => {
-    if (toast.parentNode) {
-      toast.classList.remove('show');
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.remove();
-        }
-      }, 300);
+    if (alert.parentNode) {
+      alert.classList.remove('show');
+      setTimeout(() => alert.remove(), 300);
     }
   }, 5000);
 }
-
-function setupThemeToggle() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  
-  let themeToggle = document.getElementById('themeToggle');
-  if (!themeToggle) {
-    themeToggle = document.createElement('button');
-    themeToggle.id = 'themeToggle';
-    themeToggle.className = 'theme-toggle';
-    themeToggle.innerHTML = `<i class="fas ${savedTheme === 'light' ? 'fa-moon' : 'fa-sun'}"></i>`;
-    document.querySelector('.greeting-wrapper').appendChild(themeToggle);
-  }
-  
-  themeToggle.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    
-    themeToggle.innerHTML = `<i class="fas ${newTheme === 'light' ? 'fa-moon' : 'fa-sun'}"></i>`;
-    
-    showToast(`Switched to ${newTheme} theme`, 'success');
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  initDashboard();
-  setupThemeToggle();
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has('new') && urlParams.get('new') === 'true') {
-    showToast('Welcome to your dashboard!', 'success');
-  }
-});
