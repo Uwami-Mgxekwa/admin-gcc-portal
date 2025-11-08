@@ -720,33 +720,87 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .header {
+    padding: 12px 15px;
+  }
+
+  .logo-container p {
+    font-size: 0.95rem;
+  }
+
+  .school-logo {
+    width: 35px;
+    height: 35px;
+  }
+
+  .greeting-wrapper {
+    display: none;
+  }
+
   .sidebar {
     transform: translateX(-100%);
+    width: 280px;
   }
   
   .sidebar.active {
     transform: translateX(0);
   }
+
+  .sidebar.collapsed {
+    width: 280px;
+  }
+
+  .sidebar.collapsed .nav-item span {
+    display: inline;
+  }
   
   .main-content {
     margin-left: 0;
+    padding: 20px 15px;
   }
   
   .sidebar-overlay {
     display: block;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+  }
+
+  .sidebar.active ~ .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
   }
   
   .admin-header {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .admin-header h1 {
+    font-size: 1.5rem;
+  }
   
   .search-bar {
     width: 100%;
+    min-width: auto;
   }
   
   .stats-cards {
     grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
   }
   
   .action-buttons {
@@ -756,14 +810,216 @@ body {
   .students-table-container {
     overflow-x: auto;
   }
+
+  .students-table th,
+  .students-table td {
+    padding: 12px 10px;
+    font-size: 0.9rem;
+  }
   
   .files-grid {
     grid-template-columns: 1fr;
   }
+
+  .file-card {
+    padding: 15px;
+  }
   
   .alert-container {
-    left: 20px;
-    right: 20px;
+    left: 15px;
+    right: 15px;
+    top: 80px;
     max-width: none;
   }
+
+  .alert {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-content {
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .file-upload-area {
+    padding: 30px 15px;
+  }
+
+  .file-upload-area i {
+    font-size: 2.5rem;
+  }
+
+  .file-upload-area p {
+    font-size: 0.9rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 10px 12px;
+  }
+
+  .logo-container {
+    gap: 10px;
+  }
+
+  .logo-container p {
+    font-size: 0.85rem;
+  }
+
+  .school-logo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .main-content {
+    padding: 15px 10px;
+  }
+
+  .admin-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .stat-info h3 {
+    font-size: 0.85rem;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+  }
+
+  .admin-section {
+    padding: 20px 15px;
+  }
+
+  .admin-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .action-btn {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+
+  .students-table th,
+  .students-table td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .file-card {
+    padding: 12px;
+  }
+
+  .file-info h4 {
+    font-size: 1rem;
+  }
+
+  .file-category {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+  }
+
+  .file-path {
+    font-size: 0.8rem;
+  }
+
+  .btn-icon {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .modal-header {
+    padding: 12px 15px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .modal-body {
+    padding: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .file-upload-area {
+    padding: 25px 10px;
+  }
+
+  .file-upload-area i {
+    font-size: 2rem;
+  }
+
+  .file-upload-area p {
+    font-size: 0.85rem;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+
+/* Textarea styling */
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  transition: var(--transition);
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
 }
