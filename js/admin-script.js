@@ -251,8 +251,6 @@ async function loadFiles() {
   const filesGrid = document.getElementById('filesGrid');
   filesGrid.innerHTML = '<div class="loading">Loading files...</div>';
   
-  // This is a placeholder - you'll need to implement actual file listing
-  // For now, we'll show the files that should be in the resources folder
   const files = [
     { name: 'Exam Timetable 2025', category: 'timetables', path: 'resources/Exam-Timetable-2025.pdf' },
     { name: 'Application Form', category: 'forms', path: 'resources/Application-Form.pdf' },
@@ -366,7 +364,7 @@ window.deleteFile = deleteFile;
 async function handleSignOut() {
   if (confirm('Are you sure you want to sign out?')) {
     await supabase.auth.signOut();
-    window.location.href = '../../index.html';
+    window.location.href = 'index.html';
   }
 }
 
