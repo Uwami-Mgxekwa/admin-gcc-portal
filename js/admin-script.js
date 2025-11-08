@@ -36,6 +36,7 @@ function initDashboard() {
   loadProfileInfo();
   setupCalendar();
   loadSavedNotes();
+  setupCalendarToggle(); // Add calendar toggle functionality
 }
 
 function setCurrentDate() {
@@ -264,8 +265,6 @@ function handleApproval(button, isApproved) {
   }, 500);
 }
 
-
-
 function handleSignOut() {
   if (confirm('Are you sure you want to sign out?')) {
     console.log('Signing out...');
@@ -274,70 +273,139 @@ function handleSignOut() {
 }
 
 function setupCalendar() {
-    const date = new Date();
-    const currentMonth = date.getMonth();
-    const currentYear = date.getFullYear();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  const date = new Date();
+  const currentMonth = date.getMonth();
+  const currentYear = date.getFullYear();
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
-    let calendarHTML = `
-      <div class="calendar-header">
-        <button class="month-nav prev"><i class="fas fa-chevron-left"></i></button>
-        <h4>${monthNames[currentMonth]} ${currentYear}</h4>
-        <button class="month-nav next"><i class="fas fa-chevron-right"></i></button>
-      </div>
-      <div class="calendar-days">
-        <div class="day-name">Su</div>
-        <div class="day-name">Mo</div>
-        <div class="day-name">Tu</div>
-        <div class="day-name">We</div>
-        <div class="day-name">Th</div>
-        <div class="day-name">Fr</div>
-        <div class="day-name">Sa</div>
-    `;
-    
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      calendarHTML += '<div class="day empty"></div>';
-    }
-    
-    for (let i = 1; i <= daysInMonth; i++) {
-      const isToday = i === date.getDate();
-      const hasEvent = [5, 12, 20, 25].includes(i);
-      
-      calendarHTML += `<div class="day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">${i}</div>`;
-    }
-    
-    const totalCells = Math.ceil((daysInMonth + firstDayOfMonth) / 7) * 7;
-    const remainingCells = totalCells - (daysInMonth + firstDayOfMonth);
-    
-    for (let i = 0; i < remainingCells; i++) {
-      calendarHTML += '<div class="day empty"></div>';
-    }
-    
-    calendarHTML += '</div>';
-
-    miniCalendar.innerHTML = calendarHTML;
-    
-    const prevMonthBtn = miniCalendar.querySelector('.month-nav.prev');
-    const nextMonthBtn = miniCalendar.querySelector('.month-nav.next');
-    
-    prevMonthBtn.addEventListener('click', () => {
-      showNotImplemented('Previous Month Navigation');
-    });
-    
-    nextMonthBtn.addEventListener('click', () => {
-      showNotImplemented('Next Month Navigation');
-    });
-    
-    const eventDays = miniCalendar.querySelectorAll('.day.has-event');
-    eventDays.forEach(day => {
-      day.addEventListener('click', () => {
-        showNotImplemented(`View Events for ${monthNames[currentMonth]} ${day.textContent}, ${currentYear}`);
-      });
-    });
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  let calendarHTML = `
+    <div class="calendar-header">
+      <button class="month-nav prev"><i class="fas fa-chevron-left"></i></button>
+      <h4>${monthNames[currentMonth]} ${currentYear}</h4>
+      <button class="month-nav next"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="calendar-days">
+      <div class="day-name">Su</div>
+      <div class="day-name">Mo</div>
+      <div class="day-name">Tu</div>
+      <div class="day-name">We</div>
+      <div class="day-name">Th</div>
+      <div class="day-name">Fr</div>
+      <div class="day-name">Sa</div>
+  `;
+  
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    calendarHTML += '<div class="day empty"></div>';
   }
+  
+  for (let i = 1; i <= daysInMonth; i++) {
+    const isToday = i === date.getDate();
+    const hasEvent = [5, 12, 20, 25].includes(i);
+    
+    calendarHTML += `<div class="day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">${i}</div>`;
+  }
+  
+  const totalCells = Math.ceil((daysInMonth + firstDayOfMonth) / 7) * 7;
+  const remainingCells = totalCells - (daysInMonth + firstDayOfMonth);
+  
+  for (let i = 0; i < remainingCells; i++) {
+    calendarHTML += '<div class="day empty"></div>';
+  }
+  
+  calendarHTML += '</div>';
+
+  miniCalendar.innerHTML = calendarHTML;
+  
+  const prevMonthBtn = miniCalendar.querySelector('.month-nav.prev');
+  const nextMonthBtn = miniCalendar.querySelector('.month-nav.next');
+  
+  prevMonthBtn.addEventListener('click', () => {
+    showNotImplemented('Previous Month Navigation');
+  });
+  
+  nextMonthBtn.addEventListener('click', () => {
+    showNotImplemented('Next Month Navigation');
+  });
+  
+  const eventDays = miniCalendar.querySelectorAll('.day.has-event');
+  eventDays.forEach(day => {
+    day.addEventListener('click', () => {
+      showNotImplemented(`View Events for ${monthNames[currentMonth]} ${day.textContent}, ${currentYear}`);
+    });
+  });
+}
+
+// NEW FUNCTION: Setup right sidebar toggle functionality
+function setupCalendarToggle() {
+  const rightSidebar = document.querySelector('.right-sidebar');
+  
+  if (!rightSidebar) return;
+  
+  // Check if toggle button already exists
+  let toggleBtn = document.getElementById('toggleRightSidebar');
+  
+  if (!toggleBtn) {
+    // Create toggle button
+    toggleBtn = document.createElement('button');
+    toggleBtn.id = 'toggleRightSidebar';
+    toggleBtn.className = 'toggle-sidebar-btn';
+    toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    toggleBtn.title = 'Hide sidebar';
+    
+    // Insert button at the top of right sidebar
+    rightSidebar.insertBefore(toggleBtn, rightSidebar.firstChild);
+  }
+  
+  // Load saved state from localStorage
+  const isCollapsed = localStorage.getItem('rightSidebarCollapsed') === 'true';
+  if (isCollapsed) {
+    rightSidebar.classList.add('collapsed');
+    toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    toggleBtn.title = 'Show sidebar';
+    adjustMainContentWidth(true);
+  }
+  
+  // Add click event listener
+  toggleBtn.addEventListener('click', function() {
+    rightSidebar.classList.toggle('collapsed');
+    
+    if (rightSidebar.classList.contains('collapsed')) {
+      toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+      toggleBtn.title = 'Show sidebar';
+      localStorage.setItem('rightSidebarCollapsed', 'true');
+      adjustMainContentWidth(true);
+    } else {
+      toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+      toggleBtn.title = 'Hide sidebar';
+      localStorage.setItem('rightSidebarCollapsed', 'false');
+      adjustMainContentWidth(false);
+    }
+  });
+}
+
+// Adjust main content width based on sidebar state
+function adjustMainContentWidth(sidebarCollapsed) {
+  const mainContent = document.getElementById('mainContent');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarWidth = sidebar.classList.contains('collapsed') ? 70 : 250;
+  
+  if (window.innerWidth <= 992) {
+    mainContent.style.width = `calc(100% - ${sidebarWidth}px)`;
+  } else {
+    if (sidebarCollapsed) {
+      mainContent.style.width = `calc(100% - ${sidebarWidth}px - 50px)`;
+    } else {
+      mainContent.style.width = `calc(100% - ${sidebarWidth}px - 300px)`;
+    }
+  }
+  
+  if (window.innerWidth <= 768) {
+    mainContent.style.width = '100%';
+  }
+}
 
 function saveUserNotes() {
   const notes = quickNotes.value.trim();
@@ -434,9 +502,4 @@ document.addEventListener('DOMContentLoaded', () => {
   if (urlParams.has('new') && urlParams.get('new') === 'true') {
     showToast('Welcome to your dashboard!', 'success');
   }
-});
-
-document.getElementById("toggleCalendar").addEventListener("click", function() {
-  var calendar = document.getElementById("miniCalendar");
-  calendar.classList.toggle("collapsed");
 });

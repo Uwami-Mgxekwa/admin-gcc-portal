@@ -499,13 +499,44 @@ a:hover {
   color: var(--text-color);
 }
 
+#toggleCalendar {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#toggleCalendar:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.calendar-widget {
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
 .mini-calendar {
   background-color: var(--bg-color);
   border-radius: 8px;
   padding: 15px;
   height: auto; 
   max-height: 300px; 
-  overflow: hidden; 
+  overflow: hidden;
+  transition: all 0.3s ease;
+  opacity: 1;
+  transform-origin: top;
+  transform: scaleY(1);
 }
 
 .calendar-days {
@@ -864,5 +895,122 @@ a:hover {
 }
 
 .mini-calendar.collapsed {
-  display: none;
+  max-height: 0;
+  padding: 0;
+  opacity: 0;
+  transform: scaleY(0);
+  margin: 0;
+}
+/* Add these styles to your admin-style.css */
+
+/* Toggle button for right sidebar */
+.toggle-sidebar-btn {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 60px;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  transition: all 0.3s ease;
+  z-index: 95;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.toggle-sidebar-btn i {
+  font-size: 1.2rem;
+}
+
+/* Right sidebar collapsed state */
+.right-sidebar.collapsed {
+  right: -300px;
+}
+
+.right-sidebar {
+  transition: right 0.3s ease;
+}
+
+/* Move toggle button when sidebar is collapsed */
+.right-sidebar.collapsed .toggle-sidebar-btn {
+  right: 0;
+}
+
+/* When sidebar is expanded, move button with it */
+.right-sidebar:not(.collapsed) .toggle-sidebar-btn {
+  right: 300px;
+}
+
+/* Adjust main content when right sidebar is collapsed */
+@media (min-width: 993px) {
+  .right-sidebar.collapsed ~ .main-content {
+    width: calc(100% - 70px) !important;
+  }
+  
+  body:has(.sidebar:not(.collapsed)) .right-sidebar.collapsed ~ .main-content {
+    width: calc(100% - 250px) !important;
+  }
+}
+
+/* Hide toggle button on mobile */
+@media (max-width: 992px) {
+  .toggle-sidebar-btn {
+    display: none;
+  }
+}
+
+/* Theme toggle button styling */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.theme-toggle:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: rotate(20deg);
+}
+
+.theme-toggle i {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Dark theme adjustments for toggle button */
+[data-theme="dark"] .toggle-sidebar-btn {
+  background-color: var(--bg-light);
+  border-color: var(--border-color);
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .toggle-sidebar-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
