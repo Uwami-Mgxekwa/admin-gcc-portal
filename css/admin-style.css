@@ -740,6 +740,7 @@ body {
   .sidebar {
     transform: translateX(-100%);
     width: 280px;
+    position: fixed;
   }
   
   .sidebar.active {
@@ -748,6 +749,11 @@ body {
 
   .sidebar.collapsed {
     width: 280px;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.collapsed.active {
+    transform: translateX(0);
   }
 
   .sidebar.collapsed .nav-item span {
@@ -755,8 +761,12 @@ body {
   }
   
   .main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
     padding: 20px 15px;
+  }
+
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 0 !important;
   }
   
   .sidebar-overlay {
