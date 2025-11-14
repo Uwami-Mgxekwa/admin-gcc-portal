@@ -1023,3 +1023,113 @@ body {
   outline: none;
   border-color: var(--primary-color);
 }
+
+/* Student Management Enhancements */
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.action-buttons-cell {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.btn-icon:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btn-icon.btn-edit {
+  color: #3b82f6;
+}
+
+.btn-icon.btn-edit:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.btn-icon.btn-danger {
+  color: #ef4444;
+  background: transparent;
+}
+
+.btn-icon.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.btn-icon i {
+  display: inline-block;
+  opacity: 1;
+}
+
+.students-table td {
+  vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .btn-primary {
+    width: 100%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .students-table {
+    font-size: 0.85rem;
+  }
+
+  .action-buttons-cell {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .students-table th,
+  .students-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-icon {
+    padding: 0.25rem;
+    font-size: 0.85rem;
+  }
+}
