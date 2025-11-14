@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events Management - GCC Admin</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../css/admin-style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo-container">
+      <div class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <img src="../assets/logo.png" alt="School Logo" class="school-logo" />
+      <p>Gauteng City College Admin</p>
+    </div>
+    <div class="greeting-wrapper">
+      <p class="greeting" id="greeting">Welcome, Admin</p>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <div class="sidebar collapsed" id="sidebar">
+      <nav>
+        <div class="nav-item" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="students">
+          <i class="fas fa-users"></i>
+          <span>Students</span>
+        </div>
+        <div class="nav-item" data-page="courses">
+          <i class="fas fa-book"></i>
+          <span>Courses</span>
+        </div>
+        <div class="nav-item" data-page="schedules">
+          <i class="fas fa-calendar-week"></i>
+          <span>Schedules</span>
+        </div>
+        <div class="nav-item" data-page="notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+        </div>
+        <div class="nav-item active" data-page="events">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Events</span>
+        </div>
+        <div class="nav-item" data-page="finances">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Finances</span>
+        </div>
+        <div class="nav-item" data-page="files">
+          <i class="fas fa-file-alt"></i>
+          <span>File Manager</span>
+        </div>
+        <div class="nav-item sign-out" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sign out</span>
+        </div>
+      </nav>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content" id="mainContent">
+      <div class="admin-header">
+        <h1>Events Management</h1>
+        <button class="btn-primary" id="addEventBtn">
+          <i class="fas fa-plus"></i> Create Event
+        </button>
+      </div>
+
+      <div class="events-grid" id="eventsGrid">
+        <div class="loading">Loading events...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Add/Edit Event -->
+  <div class="modal" id="eventModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="eventModalTitle">Create Event</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm">
+          <input type="hidden" id="eventId" name="eventId">
+          
+          <div class="form-group">
+            <label for="eventTitle">Event Title *</label>
+            <input type="text" id="eventTitle" name="eventTitle" placeholder="e.g., Freshers Welcome" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventDate">Event Date *</label>
+              <input type="date" id="eventDate" name="eventDate" required>
+            </div>
+            <div class="form-group">
+              <label for="eventTime">Event Time *</label>
+              <input type="text" id="eventTime" name="eventTime" placeholder="e.g., 9:00 AM - 5:00 PM" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eventLocation">Location *</label>
+            <input type="text" id="eventLocation" name="eventLocation" placeholder="e.g., Main Campus" required>
+          </div>
+
+          <div class="form-group">
+            <label for="eventDescription">Description *</label>
+            <textarea id="eventDescription" name="eventDescription" placeholder="Brief description of the event" rows="3" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eventType">Event Type *</label>
+              <select id="eventType" name="eventType" required>
+                <option value="">Select Type</option>
+                <option value="academic">Academic</option>
+                <option value="social">Social</option>
+                <option value="workshop">Workshop</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="eventAttendees">Expected Attendees</label>
+              <input type="number" id="eventAttendees" name="eventAttendees" placeholder="e.g., 100" min="0">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-submit" id="eventSubmitBtn">Create Event</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Container -->
+  <div id="alertContainer" class="alert-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../js/events-script.js"></script>
+</body>
+
+</html>

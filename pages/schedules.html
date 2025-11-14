@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule Management - GCC Admin</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../css/admin-style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <div class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <img src="../assets/logo.png" alt="School Logo" class="school-logo" />
+      <p>Gauteng City College Admin</p>
+    </div>
+    <div class="greeting-wrapper">
+      <p class="greeting" id="greeting">Welcome, Admin</p>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <div class="sidebar collapsed" id="sidebar">
+      <nav>
+        <div class="nav-item" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="students">
+          <i class="fas fa-users"></i>
+          <span>Students</span>
+        </div>
+        <div class="nav-item" data-page="courses">
+          <i class="fas fa-book"></i>
+          <span>Courses</span>
+        </div>
+        <div class="nav-item active" data-page="schedules">
+          <i class="fas fa-calendar-week"></i>
+          <span>Schedules</span>
+        </div>
+        <div class="nav-item" data-page="notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+        </div>
+        <div class="nav-item" data-page="events">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Events</span>
+        </div>
+        <div class="nav-item" data-page="finances">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Finances</span>
+        </div>
+        <div class="nav-item" data-page="files">
+          <i class="fas fa-file-alt"></i>
+          <span>File Manager</span>
+        </div>
+        <div class="nav-item sign-out" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sign out</span>
+        </div>
+      </nav>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content" id="mainContent">
+      <div class="admin-header">
+        <h1>Schedule Management</h1>
+        <button class="btn-primary" id="addScheduleBtn">
+          <i class="fas fa-plus"></i> Create Schedule
+        </button>
+      </div>
+
+      <div class="schedules-list" id="schedulesList">
+        <div class="loading">Loading schedules...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Add/Edit Schedule -->
+  <div class="modal" id="scheduleModal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2 id="scheduleModalTitle">Create Schedule</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleForm">
+          <input type="hidden" id="scheduleId" name="scheduleId">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleCourse">Course *</label>
+              <input type="text" id="scheduleCourse" placeholder="e.g., Information Technology" required>
+            </div>
+            <div class="form-group">
+              <label for="scheduleCertificate">Certificate *</label>
+              <input type="text" id="scheduleCertificate" placeholder="e.g., National Certificate" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="scheduleYear">Year *</label>
+              <select id="scheduleYear" required>
+                <option value="">Select Year</option>
+                <option value="1">Year 1</option>
+                <option value="2">Year 2</option>
+                <option value="3">Year 3</option>
+                <option value="all">All Years</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Weekly Schedule *</label>
+            <div id="scheduleBuilder">
+              <div class="day-schedule" data-day="Monday">
+                <h4>Monday</h4>
+                <input type="text" class="module-input" placeholder="Module 1" data-period="0">
+                <input type="text" class="module-input" placeholder="Module 2" data-period="1">
+                <input type="text" class="module-input" placeholder="Module 3" data-period="2">
+                <input type="text" class="module-input" placeholder="Module 4" data-period="3">
+                <input type="text" class="module-input" placeholder="Module 5" data-period="4">
+                <input type="text" class="module-input" placeholder="Module 6" data-period="5">
+                <input type="text" class="module-input" placeholder="Module 7" data-period="6">
+                <input type="text" class="module-input" placeholder="Module 8" data-period="7">
+              </div>
+              <div class="day-schedule" data-day="Tuesday">
+                <h4>Tuesday</h4>
+                <input type="text" class="module-input" placeholder="Module 1" data-period="0">
+                <input type="text" class="module-input" placeholder="Module 2" data-period="1">
+                <input type="text" class="module-input" placeholder="Module 3" data-period="2">
+                <input type="text" class="module-input" placeholder="Module 4" data-period="3">
+                <input type="text" class="module-input" placeholder="Module 5" data-period="4">
+                <input type="text" class="module-input" placeholder="Module 6" data-period="5">
+                <input type="text" class="module-input" placeholder="Module 7" data-period="6">
+                <input type="text" class="module-input" placeholder="Module 8" data-period="7">
+              </div>
+              <div class="day-schedule" data-day="Wednesday">
+                <h4>Wednesday</h4>
+                <input type="text" class="module-input" placeholder="Module 1" data-period="0">
+                <input type="text" class="module-input" placeholder="Module 2" data-period="1">
+                <input type="text" class="module-input" placeholder="Module 3" data-period="2">
+                <input type="text" class="module-input" placeholder="Module 4" data-period="3">
+                <input type="text" class="module-input" placeholder="Module 5" data-period="4">
+                <input type="text" class="module-input" placeholder="Module 6" data-period="5">
+                <input type="text" class="module-input" placeholder="Module 7" data-period="6">
+                <input type="text" class="module-input" placeholder="Module 8" data-period="7">
+              </div>
+              <div class="day-schedule" data-day="Thursday">
+                <h4>Thursday</h4>
+                <input type="text" class="module-input" placeholder="Module 1" data-period="0">
+                <input type="text" class="module-input" placeholder="Module 2" data-period="1">
+                <input type="text" class="module-input" placeholder="Module 3" data-period="2">
+                <input type="text" class="module-input" placeholder="Module 4" data-period="3">
+                <input type="text" class="module-input" placeholder="Module 5" data-period="4">
+                <input type="text" class="module-input" placeholder="Module 6" data-period="5">
+                <input type="text" class="module-input" placeholder="Module 7" data-period="6">
+                <input type="text" class="module-input" placeholder="Module 8" data-period="7">
+              </div>
+              <div class="day-schedule" data-day="Friday">
+                <h4>Friday</h4>
+                <input type="text" class="module-input" placeholder="Module 1" data-period="0">
+                <input type="text" class="module-input" placeholder="Module 2" data-period="1">
+                <input type="text" class="module-input" placeholder="Module 3" data-period="2">
+                <input type="text" class="module-input" placeholder="Module 4" data-period="3">
+                <input type="text" class="module-input" placeholder="Module 5" data-period="4">
+                <input type="text" class="module-input" placeholder="Module 6" data-period="5">
+                <input type="text" class="module-input" placeholder="Module 7" data-period="6">
+                <input type="text" class="module-input" placeholder="Module 8" data-period="7">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-submit" id="scheduleSubmitBtn">Save Schedule</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="alertContainer" class="alert-container"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../js/schedules-script.js"></script>
+</body>
+</html>

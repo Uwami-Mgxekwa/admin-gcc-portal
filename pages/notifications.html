@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications Management - GCC Admin</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../css/admin-style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo-container">
+      <div class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <img src="../assets/logo.png" alt="School Logo" class="school-logo" />
+      <p>Gauteng City College Admin</p>
+    </div>
+    <div class="greeting-wrapper">
+      <p class="greeting" id="greeting">Welcome, Admin</p>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <div class="sidebar collapsed" id="sidebar">
+      <nav>
+        <div class="nav-item" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="students">
+          <i class="fas fa-users"></i>
+          <span>Students</span>
+        </div>
+        <div class="nav-item" data-page="courses">
+          <i class="fas fa-book"></i>
+          <span>Courses</span>
+        </div>
+        <div class="nav-item" data-page="schedules">
+          <i class="fas fa-calendar-week"></i>
+          <span>Schedules</span>
+        </div>
+        <div class="nav-item active" data-page="notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+        </div>
+        <div class="nav-item" data-page="events">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Events</span>
+        </div>
+        <div class="nav-item" data-page="finances">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Finances</span>
+        </div>
+        <div class="nav-item" data-page="files">
+          <i class="fas fa-file-alt"></i>
+          <span>File Manager</span>
+        </div>
+        <div class="nav-item sign-out" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sign out</span>
+        </div>
+      </nav>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content" id="mainContent">
+      <div class="admin-header">
+        <h1>Notifications Management</h1>
+        <button class="btn-primary" id="addNotificationBtn">
+          <i class="fas fa-plus"></i> Create Notification
+        </button>
+      </div>
+
+      <div class="notifications-grid" id="notificationsGrid">
+        <div class="loading">Loading notifications...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Add/Edit Notification -->
+  <div class="modal" id="notificationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="notificationModalTitle">Create Notification</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="notificationForm">
+          <input type="hidden" id="notificationId" name="notificationId">
+          
+          <div class="form-group">
+            <label for="notificationTitle">Title *</label>
+            <input type="text" id="notificationTitle" name="notificationTitle" placeholder="e.g., Exam Schedule Released" required maxlength="200">
+          </div>
+
+          <div class="form-group">
+            <label for="notificationMessage">Message *</label>
+            <textarea id="notificationMessage" name="notificationMessage" placeholder="Enter notification message" rows="4" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="notificationType">Type *</label>
+              <select id="notificationType" name="notificationType" required>
+                <option value="">Select Type</option>
+                <option value="general">General</option>
+                <option value="urgent">Urgent</option>
+                <option value="academic">Academic</option>
+                <option value="financial">Financial</option>
+                <option value="event">Event</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="targetAudience">Target Audience *</label>
+              <select id="targetAudience" name="targetAudience" required>
+                <option value="">Select Audience</option>
+                <option value="all">All Students</option>
+                <option value="year-1">Year 1 Only</option>
+                <option value="year-2">Year 2 Only</option>
+                <option value="year-3">Year 3 Only</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="isUrgent" name="isUrgent">
+              Mark as Urgent (will be highlighted)
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="isActive" name="isActive" checked>
+              Active (visible to students)
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-submit" id="notificationSubmitBtn">Create Notification</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Container -->
+  <div id="alertContainer" class="alert-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../js/notifications-script.js"></script>
+</body>
+
+</html>

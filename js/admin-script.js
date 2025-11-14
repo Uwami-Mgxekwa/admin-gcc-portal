@@ -200,6 +200,28 @@ function setupEventListeners() {
 }
 
 function switchPage(pageName) {
+  // Navigate to separate pages
+  if (pageName === 'courses') {
+    window.location.href = 'pages/courses.html';
+    return;
+  }
+  if (pageName === 'schedules') {
+    window.location.href = 'pages/schedules.html';
+    return;
+  }
+  if (pageName === 'events') {
+    window.location.href = 'pages/events.html';
+    return;
+  }
+  if (pageName === 'notifications') {
+    window.location.href = 'pages/notifications.html';
+    return;
+  }
+  if (pageName === 'finances') {
+    window.location.href = 'pages/finances.html';
+    return;
+  }
+
   // Hide all pages
   document.querySelectorAll('.page-content').forEach(page => {
     page.classList.remove('active');
@@ -702,8 +724,38 @@ async function deleteStudent(studentId, studentNumber) {
   }
 
   try {
+    // First, get the student to find their student_id
+    const { data: student, error: fetchError } = await supabase
+      .from('students')
+      .select('student_id')
+      .eq('id', studentId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete from student_info first (child table) using student_id
+    try {
+      await supabase
+        .from('student_info')
+        .delete()
+        .eq('student_id', student.student_id);
+    } catch (infoError) {
+      console.log('No student_info record to delete or already deleted');
+    }
+
+    // Delete from student_finances if exists
+    try {
+      await supabase
+        .from('student_finances')
+        .delete()
+        .eq('student_id', student.student_id);
+    } catch (financeError) {
+      console.log('No finance record to delete');
+    }
+
+    // Finally, delete from students table (parent table)
     const { error } = await supabase
-      .from('student_info')
+      .from('students')
       .delete()
       .eq('id', studentId);
 

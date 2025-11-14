@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance Management - GCC Admin</title>
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <link rel="stylesheet" href="../css/admin-style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="logo-container">
+      <div class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      <img src="../assets/logo.png" alt="School Logo" class="school-logo" />
+      <p>Gauteng City College Admin</p>
+    </div>
+    <div class="greeting-wrapper">
+      <p class="greeting" id="greeting">Welcome, Admin</p>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <div class="sidebar collapsed" id="sidebar">
+      <nav>
+        <div class="nav-item" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="students">
+          <i class="fas fa-users"></i>
+          <span>Students</span>
+        </div>
+        <div class="nav-item" data-page="courses">
+          <i class="fas fa-book"></i>
+          <span>Courses</span>
+        </div>
+        <div class="nav-item" data-page="schedules">
+          <i class="fas fa-calendar-week"></i>
+          <span>Schedules</span>
+        </div>
+        <div class="nav-item" data-page="notifications">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+        </div>
+        <div class="nav-item" data-page="events">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Events</span>
+        </div>
+        <div class="nav-item active" data-page="finances">
+          <i class="fas fa-dollar-sign"></i>
+          <span>Finances</span>
+        </div>
+        <div class="nav-item" data-page="files">
+          <i class="fas fa-file-alt"></i>
+          <span>File Manager</span>
+        </div>
+        <div class="nav-item sign-out" id="sign-out">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sign out</span>
+        </div>
+      </nav>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content" id="mainContent">
+      <div class="admin-header">
+        <h1>Finance Management</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="financeSearch" placeholder="Search by student ID or name...">
+          </div>
+          <button class="btn-primary" id="addFinanceBtn">
+            <i class="fas fa-plus"></i> Add Finance Record
+          </button>
+        </div>
+      </div>
+
+      <div class="finance-stats">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Paid Students</h3>
+            <p class="stat-number" id="paidCount">0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+            <i class="fas fa-exclamation-circle"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Outstanding</h3>
+            <p class="stat-number" id="outstandingCount">0</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Total Revenue</h3>
+            <p class="stat-number" id="totalRevenue">R 0</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="finance-table-container">
+        <table class="students-table">
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Total Fees</th>
+              <th>Amount Paid</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Last Payment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="financeTableBody">
+            <tr>
+              <td colspan="9" class="loading">Loading finance records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Add/Edit Finance Record -->
+  <div class="modal" id="financeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="financeModalTitle">Add Finance Record</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="financeForm">
+          <input type="hidden" id="financeId" name="financeId">
+          
+          <div class="form-group">
+            <label for="studentSelect">Student *</label>
+            <select id="studentSelect" name="studentSelect" required>
+              <option value="">Select Student</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="totalFees">Total Fees (R) *</label>
+              <input type="number" id="totalFees" name="totalFees" placeholder="e.g., 25000" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="amountPaid">Amount Paid (R) *</label>
+              <input type="number" id="amountPaid" name="amountPaid" placeholder="e.g., 15000" min="0" step="0.01" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentMethod">Payment Method</label>
+            <select id="paymentMethod" name="paymentMethod">
+              <option value="">Select Method</option>
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="card">Card</option>
+              <option value="eft">EFT</option>
+              <option value="bursary">Bursary</option>
+              <option value="nsfas">NSFAS</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentNotes">Notes (Optional)</label>
+            <textarea id="paymentNotes" name="paymentNotes" placeholder="Additional payment information" rows="3"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-submit" id="financeSubmitBtn">Save Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Payment History -->
+  <div class="modal" id="paymentHistoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Payment History</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="paymentHistoryContent">
+          <div class="loading">Loading payment history...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Container -->
+  <div id="alertContainer" class="alert-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../js/finances-script.js"></script>
+</body>
+
+</html>
