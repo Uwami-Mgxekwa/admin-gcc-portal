@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Academic Calendar - GCC Admin</title>
+  <title>Assignments Management - GCC Admin</title>
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../css/admin-style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -37,7 +37,7 @@
           <i class="fas fa-book"></i>
           <span>Courses</span>
         </div>
-        <div class="nav-item" data-page="assignments">
+        <div class="nav-item active" data-page="assignments">
           <i class="fas fa-tasks"></i>
           <span>Assignments</span>
         </div>
@@ -45,7 +45,7 @@
           <i class="fas fa-calendar-week"></i>
           <span>Schedules</span>
         </div>
-        <div class="nav-item active" data-page="calendar">
+        <div class="nav-item" data-page="calendar">
           <i class="fas fa-calendar-check"></i>
           <span>Calendar</span>
         </div>
@@ -75,88 +75,58 @@
 
     <div class="main-content" id="mainContent">
       <div class="admin-header">
-        <h1>Academic Calendar Management</h1>
-        <button class="btn-primary" id="addDateBtn">
-          <i class="fas fa-plus"></i> Mark Important Date
+        <h1>Assignments Management</h1>
+        <button class="btn-primary" id="addAssignmentBtn">
+          <i class="fas fa-plus"></i> Add Assignment
         </button>
       </div>
 
-      <div class="calendar-management">
-        <div class="calendar-legend">
-          <h3>Legend</h3>
-          <div class="legend-items">
-            <div class="legend-item">
-              <span class="legend-color" style="background: #10b981;"></span>
-              <span>Tests</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #ef4444;"></span>
-              <span>Exams</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #f59e0b;"></span>
-              <span>Deadlines</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #3b82f6;"></span>
-              <span>Holidays</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="important-dates-list" id="importantDatesList">
-          <div class="loading">Loading important dates...</div>
-        </div>
+      <div class="assignments-grid" id="assignmentsGrid">
+        <div class="loading">Loading assignments...</div>
       </div>
     </div>
   </div>
 
-  <!-- Modal for Add/Edit Important Date -->
-  <div class="modal" id="dateModal">
+  <!-- Modal for Add/Edit Assignment -->
+  <div class="modal" id="assignmentModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="dateModalTitle">Mark Important Date</h2>
+        <h2 id="assignmentModalTitle">Add Assignment</h2>
         <span class="close-modal">&times;</span>
       </div>
       <div class="modal-body">
-        <form id="dateForm">
-          <input type="hidden" id="dateId" name="dateId">
+        <form id="assignmentForm">
+          <input type="hidden" id="assignmentId" name="assignmentId">
           
           <div class="form-group">
-            <label for="dateTitle">Title *</label>
-            <input type="text" id="dateTitle" name="dateTitle" placeholder="e.g., Final Exams" required>
+            <label for="assignmentTitle">Assignment Title *</label>
+            <input type="text" id="assignmentTitle" placeholder="e.g., Programming Assignment 2" required>
           </div>
 
           <div class="form-group">
-            <label for="dateDescription">Description</label>
-            <textarea id="dateDescription" name="dateDescription" placeholder="Additional details" rows="2"></textarea>
+            <label for="assignmentCourse">Course *</label>
+            <input type="text" id="assignmentCourse" placeholder="e.g., Introduction to Programming" required>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="dateStart">Start Date *</label>
-              <input type="date" id="dateStart" name="dateStart" required>
+              <label for="assignmentDueDate">Due Date *</label>
+              <input type="date" id="assignmentDueDate" required>
             </div>
             <div class="form-group">
-              <label for="dateEnd">End Date</label>
-              <input type="date" id="dateEnd" name="dateEnd">
+              <label for="assignmentPriority">Priority *</label>
+              <select id="assignmentPriority" required>
+                <option value="">Select Priority</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="dateType">Type *</label>
-            <select id="dateType" name="dateType" required>
-              <option value="">Select Type</option>
-              <option value="test">Test</option>
-              <option value="exam">Exam</option>
-              <option value="deadline">Deadline</option>
-              <option value="holiday">Holiday</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="dateYear">Target Year</label>
-            <select id="dateYear" name="dateYear">
+            <label for="assignmentYear">Target Year</label>
+            <select id="assignmentYear">
               <option value="all">All Years</option>
               <option value="1">Year 1</option>
               <option value="2">Year 2</option>
@@ -166,7 +136,7 @@
 
           <div class="form-actions">
             <button type="button" class="btn-cancel">Cancel</button>
-            <button type="submit" class="btn-submit" id="dateSubmitBtn">Save Date</button>
+            <button type="submit" class="btn-submit" id="assignmentSubmitBtn">Save Assignment</button>
           </div>
         </form>
       </div>
@@ -175,6 +145,6 @@
 
   <div id="alertContainer" class="alert-container"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="../js/calendar-script.js"></script>
+  <script type="module" src="../js/assignments-script.js"></script>
 </body>
 </html>

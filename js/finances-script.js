@@ -104,6 +104,8 @@ function navigateToPage(page) {
     window.location.href = '../index.html';
   } else if (page === 'courses') {
     window.location.href = 'courses.html';
+  } else if (page === 'assignments') {
+    window.location.href = 'assignments.html';
   } else if (page === 'schedules') {
     window.location.href = 'schedules.html';
   } else if (page === 'calendar') {
@@ -113,7 +115,7 @@ function navigateToPage(page) {
   } else if (page === 'events') {
     window.location.href = 'events.html';
   } else if (page === 'files') {
-    window.location.href = '../index.html';
+    window.location.href = '../index.html#files';
   }
 }
 

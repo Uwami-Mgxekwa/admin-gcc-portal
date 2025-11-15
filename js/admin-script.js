@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDashboard();
   setupEventListeners();
   loadDashboardStats();
+  handleHashNavigation();
 });
 
 function initDashboard() {
@@ -205,6 +206,10 @@ function switchPage(pageName) {
     window.location.href = 'pages/courses.html';
     return;
   }
+  if (pageName === 'assignments') {
+    window.location.href = 'pages/assignments.html';
+    return;
+  }
   if (pageName === 'schedules') {
     window.location.href = 'pages/schedules.html';
     return;
@@ -248,6 +253,20 @@ function switchPage(pageName) {
     } else if (pageName === 'files') {
       loadFiles();
     }
+  }
+}
+
+function handleHashNavigation() {
+  const hash = window.location.hash.substring(1); // Remove the # symbol
+  if (hash) {
+    switchPage(hash);
+    // Update active nav item
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('data-page') === hash) {
+        item.classList.add('active');
+      }
+    });
   }
 }
 

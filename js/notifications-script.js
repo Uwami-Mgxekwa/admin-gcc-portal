@@ -90,6 +90,8 @@ function navigateToPage(page) {
     window.location.href = '../index.html';
   } else if (page === 'courses') {
     window.location.href = 'courses.html';
+  } else if (page === 'assignments') {
+    window.location.href = 'assignments.html';
   } else if (page === 'schedules') {
     window.location.href = 'schedules.html';
   } else if (page === 'calendar') {
@@ -99,7 +101,7 @@ function navigateToPage(page) {
   } else if (page === 'finances') {
     window.location.href = 'finances.html';
   } else if (page === 'files') {
-    window.location.href = '../index.html';
+    window.location.href = '../index.html#files';
   }
 }
 
@@ -156,7 +158,7 @@ async function loadNotifications() {
               <i class="fas fa-edit"></i>
             </button>
             <button class="btn-icon ${notification.is_active ? 'btn-warning' : 'btn-success'}" 
-                    onclick="toggleNotificationStatus('${notification.id}', ${!notification.is_active})" 
+                    onclick="toggleNotificationStatus('${notification.id}', '${!notification.is_active}')" 
                     title="${notification.is_active ? 'Deactivate' : 'Activate'}">
               <i class="fas fa-${notification.is_active ? 'eye-slash' : 'eye'}"></i>
             </button>
@@ -305,14 +307,17 @@ async function handleNotificationSubmit(e) {
 
 async function toggleNotificationStatus(notificationId, newStatus) {
   try {
+    // Convert string to boolean if needed
+    const boolStatus = newStatus === 'true' || newStatus === true;
+    
     const { error } = await supabase
       .from('announcements')
-      .update({ is_active: newStatus })
+      .update({ is_active: boolStatus })
       .eq('id', notificationId);
 
     if (error) throw error;
 
-    showAlert(`Notification ${newStatus ? 'activated' : 'deactivated'} successfully`, 'success');
+    showAlert(`Notification ${boolStatus ? 'activated' : 'deactivated'} successfully`, 'success');
     loadNotifications();
 
   } catch (error) {

@@ -69,6 +69,8 @@ function setupEventListeners() {
           window.location.href = '../index.html';
         } else if (page === 'courses') {
           window.location.href = 'courses.html';
+        } else if (page === 'assignments') {
+          window.location.href = 'assignments.html';
         } else if (page === 'schedules') {
           window.location.href = 'schedules.html';
         } else if (page === 'calendar') {
@@ -78,7 +80,7 @@ function setupEventListeners() {
         } else if (page === 'finances') {
           window.location.href = 'finances.html';
         } else if (page === 'files') {
-          window.location.href = '../index.html';
+          window.location.href = '../index.html#files';
         }
         // Only close sidebar on mobile
         if (window.innerWidth <= 768) {

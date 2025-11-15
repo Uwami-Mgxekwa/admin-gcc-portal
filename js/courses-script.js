@@ -67,13 +67,14 @@ function setupEventListeners() {
 function navigateToPage(page) {
   const pageMap = {
     'dashboard': '../index.html',
-    'students': '../index.html',
+    'students': '../index.html#students',
     'schedules': 'schedules.html',
+    'assignments': 'assignments.html',
     'calendar': 'calendar.html',
     'notifications': 'notifications.html',
     'events': 'events.html',
     'finances': 'finances.html',
-    'files': '../index.html'
+    'files': '../index.html#files'
   };
   if (pageMap[page]) window.location.href = pageMap[page];
 }
