@@ -209,6 +209,10 @@ function switchPage(pageName) {
     window.location.href = 'pages/schedules.html';
     return;
   }
+  if (pageName === 'calendar') {
+    window.location.href = 'pages/calendar.html';
+    return;
+  }
   if (pageName === 'events') {
     window.location.href = 'pages/events.html';
     return;

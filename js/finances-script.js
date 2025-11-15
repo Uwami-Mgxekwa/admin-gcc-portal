@@ -22,6 +22,10 @@ let allFinanceRecords = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize sidebar state for mobile
+  if (window.innerWidth <= 768) {
+    sidebar.classList.add('collapsed');
+  }
   setupEventListeners();
   loadFinanceRecords();
   loadStudentsForDropdown();
@@ -102,6 +106,8 @@ function navigateToPage(page) {
     window.location.href = 'courses.html';
   } else if (page === 'schedules') {
     window.location.href = 'schedules.html';
+  } else if (page === 'calendar') {
+    window.location.href = 'calendar.html';
   } else if (page === 'notifications') {
     window.location.href = 'notifications.html';
   } else if (page === 'events') {

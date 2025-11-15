@@ -16,6 +16,10 @@ const courseForm = document.getElementById('courseForm');
 const closeModalBtns = document.querySelectorAll('.close-modal, .btn-cancel');
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize sidebar state for mobile
+  if (window.innerWidth <= 768) {
+    sidebar.classList.add('collapsed');
+  }
   setupEventListeners();
   loadCourses();
   setGreeting();
@@ -65,6 +69,7 @@ function navigateToPage(page) {
     'dashboard': '../index.html',
     'students': '../index.html',
     'schedules': 'schedules.html',
+    'calendar': 'calendar.html',
     'notifications': 'notifications.html',
     'events': 'events.html',
     'finances': 'finances.html',

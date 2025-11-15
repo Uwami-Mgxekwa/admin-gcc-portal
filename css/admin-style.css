@@ -1787,3 +1787,119 @@ body {
     max-width: 100%;
   }
 }
+
+
+/* Academic Calendar Styles */
+.calendar-management {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.calendar-legend {
+  background: var(--bg-light);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  height: fit-content;
+}
+
+.calendar-legend h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: var(--text-color);
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.important-dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.date-card {
+  background: var(--bg-light);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s;
+}
+
+.date-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.date-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.date-card-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+}
+
+.date-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  text-transform: capitalize;
+  margin-right: 8px;
+}
+
+.date-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.date-card-body {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.date-description {
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .calendar-management {
+    grid-template-columns: 1fr;
+  }
+}

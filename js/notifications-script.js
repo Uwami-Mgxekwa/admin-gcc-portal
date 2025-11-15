@@ -18,6 +18,10 @@ const closeModalBtns = document.querySelectorAll('.close-modal, .btn-cancel');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize sidebar state for mobile
+  if (window.innerWidth <= 768) {
+    sidebar.classList.add('collapsed');
+  }
   setupEventListeners();
   loadNotifications();
   setGreeting();
@@ -88,6 +92,8 @@ function navigateToPage(page) {
     window.location.href = 'courses.html';
   } else if (page === 'schedules') {
     window.location.href = 'schedules.html';
+  } else if (page === 'calendar') {
+    window.location.href = 'calendar.html';
   } else if (page === 'events') {
     window.location.href = 'events.html';
   } else if (page === 'finances') {

@@ -22,6 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
 function initSidebar() {
   const isMobile = () => window.innerWidth <= 768;
 
+  // Set initial state based on screen size
+  if (isMobile()) {
+    sidebar.classList.add('collapsed');
+  }
+
   menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
     if (isMobile()) {
@@ -33,14 +38,19 @@ function initSidebar() {
   sidebarOverlay.addEventListener('click', () => {
     if (isMobile()) {
       sidebar.classList.remove('active');
+      sidebar.classList.add('collapsed');
       sidebarOverlay.style.display = 'none';
     }
   });
 
   window.addEventListener('resize', () => {
     if (isMobile()) {
+      sidebar.classList.add('collapsed');
       sidebar.classList.remove('active');
       sidebarOverlay.style.display = 'none';
+    } else {
+      sidebar.classList.remove('collapsed');
+      sidebar.classList.remove('active');
     }
   });
 }
@@ -61,6 +71,8 @@ function setupEventListeners() {
           window.location.href = 'courses.html';
         } else if (page === 'schedules') {
           window.location.href = 'schedules.html';
+        } else if (page === 'calendar') {
+          window.location.href = 'calendar.html';
         } else if (page === 'notifications') {
           window.location.href = 'notifications.html';
         } else if (page === 'finances') {

@@ -1,17 +1,14 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Events Management - GCC Admin</title>
+  <title>Academic Calendar - GCC Admin</title>
   <link rel="icon" type="image/png" href="../assets/logo.png" />
   <link rel="stylesheet" href="../css/admin-style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-
 <body>
-
   <header class="header">
     <div class="logo-container">
       <div class="menu-toggle" id="menuToggle">
@@ -44,7 +41,7 @@
           <i class="fas fa-calendar-week"></i>
           <span>Schedules</span>
         </div>
-        <div class="nav-item" data-page="calendar">
+        <div class="nav-item active" data-page="calendar">
           <i class="fas fa-calendar-check"></i>
           <span>Calendar</span>
         </div>
@@ -52,7 +49,7 @@
           <i class="fas fa-bell"></i>
           <span>Notifications</span>
         </div>
-        <div class="nav-item active" data-page="events">
+        <div class="nav-item" data-page="events">
           <i class="fas fa-calendar-alt"></i>
           <span>Events</span>
         </div>
@@ -74,85 +71,106 @@
 
     <div class="main-content" id="mainContent">
       <div class="admin-header">
-        <h1>Events Management</h1>
-        <button class="btn-primary" id="addEventBtn">
-          <i class="fas fa-plus"></i> Create Event
+        <h1>Academic Calendar Management</h1>
+        <button class="btn-primary" id="addDateBtn">
+          <i class="fas fa-plus"></i> Mark Important Date
         </button>
       </div>
 
-      <div class="events-grid" id="eventsGrid">
-        <div class="loading">Loading events...</div>
+      <div class="calendar-management">
+        <div class="calendar-legend">
+          <h3>Legend</h3>
+          <div class="legend-items">
+            <div class="legend-item">
+              <span class="legend-color" style="background: #10b981;"></span>
+              <span>Tests</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #ef4444;"></span>
+              <span>Exams</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #f59e0b;"></span>
+              <span>Deadlines</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #3b82f6;"></span>
+              <span>Holidays</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="important-dates-list" id="importantDatesList">
+          <div class="loading">Loading important dates...</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal for Add/Edit Event -->
-  <div class="modal" id="eventModal">
+  <!-- Modal for Add/Edit Important Date -->
+  <div class="modal" id="dateModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="eventModalTitle">Create Event</h2>
+        <h2 id="dateModalTitle">Mark Important Date</h2>
         <span class="close-modal">&times;</span>
       </div>
       <div class="modal-body">
-        <form id="eventForm">
-          <input type="hidden" id="eventId" name="eventId">
+        <form id="dateForm">
+          <input type="hidden" id="dateId" name="dateId">
           
           <div class="form-group">
-            <label for="eventTitle">Event Title *</label>
-            <input type="text" id="eventTitle" name="eventTitle" placeholder="e.g., Freshers Welcome" required>
+            <label for="dateTitle">Title *</label>
+            <input type="text" id="dateTitle" name="dateTitle" placeholder="e.g., Final Exams" required>
+          </div>
+
+          <div class="form-group">
+            <label for="dateDescription">Description</label>
+            <textarea id="dateDescription" name="dateDescription" placeholder="Additional details" rows="2"></textarea>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="eventDate">Event Date *</label>
-              <input type="date" id="eventDate" name="eventDate" required>
+              <label for="dateStart">Start Date *</label>
+              <input type="date" id="dateStart" name="dateStart" required>
             </div>
             <div class="form-group">
-              <label for="eventTime">Event Time *</label>
-              <input type="text" id="eventTime" name="eventTime" placeholder="e.g., 9:00 AM - 5:00 PM" required>
+              <label for="dateEnd">End Date</label>
+              <input type="date" id="dateEnd" name="dateEnd">
             </div>
           </div>
 
           <div class="form-group">
-            <label for="eventLocation">Location *</label>
-            <input type="text" id="eventLocation" name="eventLocation" placeholder="e.g., Main Campus" required>
+            <label for="dateType">Type *</label>
+            <select id="dateType" name="dateType" required>
+              <option value="">Select Type</option>
+              <option value="test">Test</option>
+              <option value="exam">Exam</option>
+              <option value="deadline">Deadline</option>
+              <option value="holiday">Holiday</option>
+            </select>
           </div>
 
           <div class="form-group">
-            <label for="eventDescription">Description *</label>
-            <textarea id="eventDescription" name="eventDescription" placeholder="Brief description of the event" rows="3" required></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="eventType">Event Type *</label>
-              <select id="eventType" name="eventType" required>
-                <option value="">Select Type</option>
-                <option value="academic">Academic</option>
-                <option value="social">Social</option>
-                <option value="workshop">Workshop</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="eventAttendees">Expected Attendees</label>
-              <input type="number" id="eventAttendees" name="eventAttendees" placeholder="e.g., 100" min="0">
-            </div>
+            <label for="dateYear">Target Year</label>
+            <select id="dateYear" name="dateYear">
+              <option value="all">All Years</option>
+              <option value="1">Year 1</option>
+              <option value="2">Year 2</option>
+              <option value="3">Year 3</option>
+            </select>
           </div>
 
           <div class="form-actions">
             <button type="button" class="btn-cancel">Cancel</button>
-            <button type="submit" class="btn-submit" id="eventSubmitBtn">Create Event</button>
+            <button type="submit" class="btn-submit" id="dateSubmitBtn">Save Date</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Alert Container -->
   <div id="alertContainer" class="alert-container"></div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="../js/events-script.js"></script>
+  <script type="module" src="../js/calendar-script.js"></script>
 </body>
-
 </html>
