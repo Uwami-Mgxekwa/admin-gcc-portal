@@ -1,11 +1,4 @@
-const SUPABASE_URL = 'https://qnroaigdrpoceasbqtmh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucm9haWdkcnBvY2Vhc2JxdG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1MzIzMzgsImV4cCI6MjA3ODEwODMzOH0.AnySEJv5FLNikQ6aGlpg-p7YSpqINjvbMuuLe4SFKQc';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Storage bucket name - CHANGE THIS to match your Supabase bucket name
-const STORAGE_BUCKET = 'resources';
-
-// Demo mode - set to true to bypass authentication
+// Back4App config loaded via <script> tag in HTML — supabase global is available
 const DEMO_MODE = true;
 
 // DOM Elements
@@ -272,23 +265,19 @@ function handleHashNavigation() {
 
 async function loadDashboardStats() {
   try {
-    // Get total students
-    const { count: studentCount, error: studentError } = await supabase
-      .from('students')
-      .select('*', { count: 'exact', head: true });
-
-    if (studentError) throw studentError;
-
+    // Get total students from Parse _User class
+    const userQuery = new Parse.Query(Parse.User);
+    userQuery.exists('student_id'); // Only count actual students
+    const studentCount = await userQuery.count();
     document.getElementById('totalStudents').textContent = studentCount || 0;
 
-    // Get total files from resources table
+    // Get total files from resources class
     const { count: fileCount, error: fileError } = await supabase
       .from('resources')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true);
 
     if (fileError) throw fileError;
-
     document.getElementById('totalFiles').textContent = fileCount || 0;
 
     // Active today (placeholder)
@@ -305,49 +294,52 @@ async function loadStudents() {
   tbody.innerHTML = '<tr><td colspan="8" class="loading">Loading students...</td></tr>';
 
   try {
-    const { data: students, error } = await supabase
-      .from('students')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Query Parse _User class for students (users with a student_id field)
+    const query = new Parse.Query(Parse.User);
+    query.exists('student_id');
+    query.descending('createdAt');
+    query.limit(1000);
+    const users = await query.find({ useMasterKey: false });
 
-    if (error) throw error;
-
-    if (!students || students.length === 0) {
+    if (!users || users.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" class="no-data">No students found</td></tr>';
       return;
     }
 
-    // Debug: log first student to see column names
-    if (students.length > 0) {
-      console.log('Sample student data:', students[0]);
-      console.log('Available columns:', Object.keys(students[0]));
-      console.log('First name value:', students[0].first_name);
-      console.log('Last name value:', students[0].last_name);
-    }
+    // For each user, try to get their StudentInfo record
+    const studentInfoQuery = new Parse.Query('StudentInfo');
+    studentInfoQuery.limit(1000);
+    const allInfoRecords = await studentInfoQuery.find();
+    const infoMap = {};
+    allInfoRecords.forEach(info => {
+      infoMap[info.get('student_id')] = info;
+    });
 
-    tbody.innerHTML = students.map(student => {
-      // Try multiple possible column names for first name
-      const firstName = student.first_name || student.name || student.firstName || '-';
-      // Try multiple possible column names for last name
-      const lastName = student.last_name || student.surname || student.lastName || '-';
-      
-      console.log(`Student ${student.student_id}: firstName="${firstName}", lastName="${lastName}"`);
-      
+    tbody.innerHTML = users.map(user => {
+      const studentId = user.get('student_id') || '-';
+      const firstName = user.get('first_name') || '-';
+      const lastName = user.get('last_name') || '-';
+      const email = user.get('email') || '-';
+      const info = infoMap[studentId];
+      const year = info ? info.get('year') : (user.get('year') || '-');
+      const course = info ? info.get('course') : (user.get('course') || 'Information Technology');
+      const createdAt = user.get('createdAt') ? new Date(user.get('createdAt')).toLocaleDateString() : '-';
+
       return `
-      <tr data-student-id="${student.id}">
-        <td>${student.student_id || '-'}</td>
+      <tr data-student-id="${user.id}">
+        <td>${studentId}</td>
         <td>${firstName}</td>
         <td>${lastName}</td>
-        <td>${student.year || '-'}</td>
-        <td>${student.course || 'Information Technology'}</td>
-        <td>${student.email || (student.student_id ? student.student_id + '@gcc.edu' : '-')}</td>
-        <td>${student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
+        <td>${year}</td>
+        <td>${course}</td>
+        <td>${email}</td>
+        <td>${createdAt}</td>
         <td>
           <div class="action-buttons-cell">
-            <button class="btn-icon btn-edit" onclick="editStudent('${student.id}')" title="Edit">
+            <button class="btn-icon btn-edit" onclick="editStudent('${user.id}')" title="Edit">
               <i class="fas fa-edit"></i>
             </button>
-            <button class="btn-icon btn-danger" onclick="deleteStudent('${student.id}', '${student.student_id || 'this student'}')" title="Delete">
+            <button class="btn-icon btn-danger" onclick="deleteStudent('${user.id}', '${studentId}')" title="Delete">
               <i class="fas fa-trash"></i>
             </button>
           </div>
@@ -356,8 +348,7 @@ async function loadStudents() {
       `;
     }).join('');
 
-    // Update student count
-    document.getElementById('totalStudents').textContent = students.length;
+    document.getElementById('totalStudents').textContent = users.length;
 
   } catch (error) {
     console.error('Error loading students:', error);
@@ -454,65 +445,33 @@ async function handleFileUpload(e) {
   const fileInput = document.getElementById('fileUpload');
   const file = fileInput.files[0];
 
-  if (!file) {
-    showAlert('Please select a file', 'error');
-    return;
-  }
+  if (!file) { showAlert('Please select a file', 'error'); return; }
+  if (file.type !== 'application/pdf') { showAlert('Only PDF files are allowed', 'error'); return; }
+  if (file.size > 10 * 1024 * 1024) { showAlert('File size must be less than 10MB', 'error'); return; }
 
-  if (file.type !== 'application/pdf') {
-    showAlert('Only PDF files are allowed', 'error');
-    return;
-  }
-
-  if (file.size > 10 * 1024 * 1024) {
-    showAlert('File size must be less than 10MB', 'error');
-    return;
-  }
-
-  // Show loading
   const submitBtn = e.target.querySelector('.btn-submit');
   const originalText = submitBtn.innerHTML;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
   submitBtn.disabled = true;
 
   try {
-    // Create storage path based on year
-    const yearFolder = fileYear === 'all' ? 'all-years' : `year-${fileYear}`;
+    // Upload file using Parse Files
     const timestamp = Date.now();
-    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
-    const storagePath = `${yearFolder}/${sanitizedFileName}-${timestamp}.pdf`;
+    const sanitizedName = fileName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
+    const parseFileName = `${sanitizedName}-${timestamp}.pdf`;
 
-    // Upload file to Supabase Storage
-    console.log('Uploading to:', STORAGE_BUCKET, storagePath);
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .upload(storagePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    const parseFile = new Parse.File(parseFileName, file, 'application/pdf');
+    await parseFile.save();
+    const publicUrl = parseFile.url();
 
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError);
-      throw uploadError;
-    }
-    
-    console.log('Upload successful:', uploadData);
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from(STORAGE_BUCKET)
-      .getPublicUrl(storagePath);
-
-    const publicUrl = urlData.publicUrl;
-
-    // Insert record into resources table
+    // Save record to resources class
     const { error: dbError } = await supabase
       .from('resources')
       .insert([{
         title: fileName,
         description: fileDescription,
         file_name: file.name,
-        storage_path: storagePath,
+        storage_path: parseFileName,
         file_url: publicUrl,
         file_size: file.size,
         file_type: file.type,
@@ -520,23 +479,16 @@ async function handleFileUpload(e) {
         course: 'Information Technology',
         year: fileYear,
         is_active: true
-      }])
-      .select();
+      }]);
 
     if (dbError) throw dbError;
 
     showAlert(`File "${fileName}" uploaded successfully!`, 'success');
-
     closeAllModals();
     uploadFileForm.reset();
     document.getElementById('filePreview').innerHTML = '';
 
-    // Reload files if on files page
-    if (filesPage.classList.contains('active')) {
-      loadFiles();
-    }
-
-    // Update dashboard stats
+    if (filesPage.classList.contains('active')) loadFiles();
     loadDashboardStats();
 
   } catch (error) {
@@ -558,14 +510,7 @@ async function deleteFile(fileId, storagePath) {
   }
 
   try {
-    // Delete from storage
-    const { error: storageError } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .remove([storagePath]);
-
-    if (storageError) throw storageError;
-
-    // Delete from database
+    // Delete the database record (Parse File deletion requires the file object — skip storage delete)
     const { error: dbError } = await supabase
       .from('resources')
       .delete()
@@ -574,8 +519,6 @@ async function deleteFile(fileId, storagePath) {
     if (dbError) throw dbError;
 
     showAlert('File deleted successfully', 'success');
-
-    // Reload files
     loadFiles();
     loadDashboardStats();
 
@@ -600,37 +543,30 @@ function openAddStudentModal() {
   openModal(modal);
 }
 
-async function editStudent(studentId) {
+async function editStudent(userId) {
   try {
-    // Fetch student data
-    const { data: student, error } = await supabase
-      .from('students')
-      .select('*')
-      .eq('id', studentId)
-      .single();
+    const query = new Parse.Query(Parse.User);
+    const user = await query.get(userId);
 
-    if (error) throw error;
+    // Get StudentInfo
+    const infoQuery = new Parse.Query('StudentInfo');
+    infoQuery.equalTo('student_id', user.get('student_id'));
+    const info = await infoQuery.first();
 
-    // Populate form
-    document.getElementById('studentId').value = student.id;
-    document.getElementById('studentNumber').value = student.student_id;
-    document.getElementById('firstName').value = student.first_name || student.name || '';
-    document.getElementById('lastName').value = student.last_name || student.surname || '';
-    document.getElementById('studentEmail').value = student.email || '';
-    document.getElementById('studentYear').value = student.year || '';
-    document.getElementById('studentCourse').value = student.course || 'Information Technology';
-    document.getElementById('profileImage').value = student.profile_image || '';
-    
-    // Password is not populated for security
+    document.getElementById('studentId').value = user.id;
+    document.getElementById('studentNumber').value = user.get('student_id') || '';
+    document.getElementById('firstName').value = user.get('first_name') || '';
+    document.getElementById('lastName').value = user.get('last_name') || '';
+    document.getElementById('studentEmail').value = user.get('email') || '';
+    document.getElementById('studentYear').value = info ? info.get('year') : '';
+    document.getElementById('studentCourse').value = info ? info.get('course') : 'Information Technology';
+    document.getElementById('profileImage').value = user.get('profile_image') || '';
     document.getElementById('studentPassword').value = '';
     document.getElementById('studentPassword').required = false;
     document.getElementById('studentPassword').placeholder = 'Leave blank to keep current password';
 
-    // Update modal title and button
     document.getElementById('studentModalTitle').textContent = 'Edit Student';
     document.getElementById('studentSubmitBtn').textContent = 'Update Student';
-
-    // Open modal
     openModal(document.getElementById('studentModal'));
 
   } catch (error) {
@@ -642,22 +578,10 @@ async function editStudent(studentId) {
 async function handleStudentSubmit(e) {
   e.preventDefault();
 
-  const studentId = document.getElementById('studentId').value;
-  const isEdit = !!studentId;
-
-  const studentData = {
-    student_id: document.getElementById('studentNumber').value.trim(),
-    first_name: document.getElementById('firstName').value.trim(),
-    last_name: document.getElementById('lastName').value.trim(),
-    email: document.getElementById('studentEmail').value.trim(),
-    year: document.getElementById('studentYear').value,
-    course: document.getElementById('studentCourse').value,
-    profile_image: document.getElementById('profileImage').value.trim() || null
-  };
-
+  const userId = document.getElementById('studentId').value;
+  const isEdit = !!userId;
   const password = document.getElementById('studentPassword').value;
 
-  // Show loading
   const submitBtn = document.getElementById('studentSubmitBtn');
   const originalText = submitBtn.innerHTML;
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
@@ -665,71 +589,67 @@ async function handleStudentSubmit(e) {
 
   try {
     if (isEdit) {
-      // Update existing student
-      const { error: updateError } = await supabase
-        .from('student_info')
-        .update(studentData)
-        .eq('id', studentId);
+      // Update existing Parse User
+      const query = new Parse.Query(Parse.User);
+      const user = await query.get(userId);
 
-      if (updateError) throw updateError;
-
-      // Update password if provided
-      if (password) {
-        const { error: authError } = await supabase.auth.admin.updateUserById(
-          studentId,
-          { password: password }
-        );
-        
-        if (authError) {
-          console.warn('Password update failed:', authError);
-          showAlert('Student updated but password change failed', 'warning');
-        }
+      user.set('first_name', document.getElementById('firstName').value.trim());
+      user.set('last_name', document.getElementById('lastName').value.trim());
+      user.set('email', document.getElementById('studentEmail').value.trim());
+      if (document.getElementById('profileImage').value.trim()) {
+        user.set('profile_image', document.getElementById('profileImage').value.trim());
       }
+      if (password && password.length >= 6) {
+        user.setPassword(password);
+      }
+      await user.save(null, { useMasterKey: false });
+
+      // Update StudentInfo
+      const infoQuery = new Parse.Query('StudentInfo');
+      infoQuery.equalTo('student_id', user.get('student_id'));
+      let info = await infoQuery.first();
+      if (!info) {
+        const StudentInfo = Parse.Object.extend('StudentInfo');
+        info = new StudentInfo();
+        info.set('student_id', user.get('student_id'));
+      }
+      info.set('year', parseInt(document.getElementById('studentYear').value));
+      info.set('course', document.getElementById('studentCourse').value);
+      await info.save();
 
       showAlert('Student updated successfully!', 'success');
 
     } else {
-      // Create new student
+      // Create new student via Parse.User.signUp
       if (!password || password.length < 6) {
         throw new Error('Password must be at least 6 characters');
       }
 
-      // First create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: studentData.email,
-        password: password,
-        options: {
-          data: {
-            first_name: studentData.first_name,
-            last_name: studentData.last_name,
-            role: 'student'
-          }
-        }
-      });
+      const studentNumber = document.getElementById('studentNumber').value.trim();
+      const newUser = new Parse.User();
+      newUser.set('username', studentNumber);
+      newUser.set('password', password);
+      newUser.set('email', document.getElementById('studentEmail').value.trim());
+      newUser.set('student_id', studentNumber);
+      newUser.set('first_name', document.getElementById('firstName').value.trim());
+      newUser.set('last_name', document.getElementById('lastName').value.trim());
+      await newUser.signUp();
 
-      if (authError) throw authError;
-
-      // Then create student record
-      const { error: insertError } = await supabase
-        .from('student_info')
-        .insert([{
-          ...studentData,
-          user_id: authData.user?.id
-        }]);
-
-      if (insertError) throw insertError;
+      // Create StudentInfo record
+      const StudentInfo = Parse.Object.extend('StudentInfo');
+      const info = new StudentInfo();
+      info.set('student_id', studentNumber);
+      info.set('year', parseInt(document.getElementById('studentYear').value));
+      info.set('course', document.getElementById('studentCourse').value);
+      info.set('campus', 'Main Campus');
+      await info.save();
 
       showAlert('Student added successfully!', 'success');
     }
 
-    // Close modal and reload students
     closeAllModals();
     document.getElementById('studentForm').reset();
-    
-    if (studentsPage.classList.contains('active')) {
-      loadStudents();
-    }
-    
+    if (studentsPage.classList.contains('active')) loadStudents();
     loadDashboardStats();
 
   } catch (error) {
@@ -741,52 +661,41 @@ async function handleStudentSubmit(e) {
   }
 }
 
-async function deleteStudent(studentId, studentNumber) {
+async function deleteStudent(userId, studentNumber) {
   if (!confirm(`Are you sure you want to delete student ${studentNumber}? This action cannot be undone.`)) {
     return;
   }
 
   try {
-    // First, get the student to find their student_id
-    const { data: student, error: fetchError } = await supabase
-      .from('students')
-      .select('student_id')
-      .eq('id', studentId)
-      .single();
+    // Get the user
+    const query = new Parse.Query(Parse.User);
+    const user = await query.get(userId);
+    const studentId = user.get('student_id');
 
-    if (fetchError) throw fetchError;
-
-    // Delete from student_info first (child table) using student_id
+    // Delete StudentInfo record
     try {
-      await supabase
-        .from('student_info')
-        .delete()
-        .eq('student_id', student.student_id);
-    } catch (infoError) {
-      console.log('No student_info record to delete or already deleted');
+      const infoQuery = new Parse.Query('StudentInfo');
+      infoQuery.equalTo('student_id', studentId);
+      const info = await infoQuery.first();
+      if (info) await info.destroy();
+    } catch (e) {
+      console.log('No StudentInfo to delete');
     }
 
-    // Delete from student_finances if exists
+    // Delete student_finances record
     try {
-      await supabase
-        .from('student_finances')
-        .delete()
-        .eq('student_id', student.student_id);
-    } catch (financeError) {
+      const finQuery = new Parse.Query('student_finances');
+      finQuery.equalTo('student_id', studentId);
+      const fin = await finQuery.first();
+      if (fin) await fin.destroy();
+    } catch (e) {
       console.log('No finance record to delete');
     }
 
-    // Finally, delete from students table (parent table)
-    const { error } = await supabase
-      .from('students')
-      .delete()
-      .eq('id', studentId);
-
-    if (error) throw error;
+    // Delete the Parse User
+    await user.destroy();
 
     showAlert('Student deleted successfully', 'success');
-
-    // Reload students
     loadStudents();
     loadDashboardStats();
 

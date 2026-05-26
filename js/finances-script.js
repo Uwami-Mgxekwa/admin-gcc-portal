@@ -1,7 +1,4 @@
-const SUPABASE_URL = 'https://qnroaigdrpoceasbqtmh.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFucm9haWdkcnBvY2Vhc2JxdG1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1MzIzMzgsImV4cCI6MjA3ODEwODMzOH0.AnySEJv5FLNikQ6aGlpg-p7YSpqINjvbMuuLe4SFKQc';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+// Back4App config loaded via <script> tag in HTML — supabase global is available
 const DEMO_MODE = true;
 
 // DOM Elements
@@ -121,20 +118,19 @@ function navigateToPage(page) {
 
 async function loadStudentsForDropdown() {
   try {
-    const { data: students, error } = await supabase
-      .from('students')
-      .select('id, student_id, first_name, last_name')
-      .order('student_id');
-
-    if (error) throw error;
+    const query = new Parse.Query(Parse.User);
+    query.exists('student_id');
+    query.ascending('student_id');
+    query.limit(1000);
+    const users = await query.find();
 
     const select = document.getElementById('studentSelect');
     select.innerHTML = '<option value="">Select Student</option>';
-    
-    students.forEach(student => {
+
+    users.forEach(user => {
       const option = document.createElement('option');
-      option.value = student.student_id;
-      option.textContent = `${student.student_id} - ${student.first_name} ${student.last_name}`;
+      option.value = user.get('student_id');
+      option.textContent = `${user.get('student_id')} - ${user.get('first_name')} ${user.get('last_name')}`;
       select.appendChild(option);
     });
 
@@ -147,13 +143,12 @@ async function loadFinanceRecords() {
   financeTableBody.innerHTML = '<tr><td colspan="9" class="loading">Loading finance records...</td></tr>';
 
   try {
-    // Get all students with their info
-    const { data: students, error: studentsError } = await supabase
-      .from('students')
-      .select('*')
-      .order('student_id');
-
-    if (studentsError) throw studentsError;
+    // Get all students from Parse _User
+    const userQuery = new Parse.Query(Parse.User);
+    userQuery.exists('student_id');
+    userQuery.ascending('student_id');
+    userQuery.limit(1000);
+    const users = await userQuery.find();
 
     // Get all finance records
     const { data: finances, error: financesError } = await supabase
@@ -163,16 +158,21 @@ async function loadFinanceRecords() {
     if (financesError) throw financesError;
 
     // Merge data
-    allFinanceRecords = students.map(student => {
-      const financeRecord = finances?.find(f => f.student_id === student.student_id) || {};
-      
+    allFinanceRecords = users.map(user => {
+      const studentId = user.get('student_id');
+      const financeRecord = finances?.find(f => f.student_id === studentId) || {};
+
       const totalFees = financeRecord.total_fees || 0;
       const amountPaid = financeRecord.amount_paid || 0;
       const balance = totalFees - amountPaid;
       const status = balance <= 0 ? 'paid' : balance < totalFees ? 'partial' : 'outstanding';
 
       return {
-        ...student,
+        id: user.id,
+        student_id: studentId,
+        first_name: user.get('first_name') || '-',
+        last_name: user.get('last_name') || '-',
+        year: user.get('year') || '-',
         finance_id: financeRecord.id,
         total_fees: totalFees,
         amount_paid: amountPaid,
